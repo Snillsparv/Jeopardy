@@ -637,67 +637,90 @@ class JeopardyGame {
         document.addEventListener('keydown', (e) => {
             const modal = document.getElementById('questionModal');
             const finalModal = document.getElementById('finalModal');
+            const finalRevealSection = document.getElementById('finalRevealSection');
+            const finalWagerSection = document.getElementById('finalWagerSection');
 
             // Buzzer-tangenter
             if (this.buzzerActive) {
                 const playerIndex = this.players.findIndex(p => p.buzzerKey === e.key);
                 if (playerIndex !== -1) {
+                    e.preventDefault();
                     this.handleBuzzer(playerIndex);
+                    return;
                 }
             }
 
-            // Högerpil för navigering
-            if (e.key === 'ArrowRight' && !modal.classList.contains('hidden')) {
-                e.preventDefault();
-                if (!this.answerShown) {
-                    this.showAnswer();
-                } else {
-                    this.closeQuestionModal();
-                }
-            }
+            // PILTANGENTER - Prioriterad hantering
 
-            // Uppåt/nedåt pilar för rätt/fel
-            if (!modal.classList.contains('hidden')) {
-                const correctBtn = document.getElementById('correctBtn');
-                const wrongBtn = document.getElementById('wrongBtn');
+            // Final Jeopardy Reveal - högsta prioritet
+            if (!finalRevealSection.classList.contains('hidden') &&
+                !finalModal.classList.contains('hidden')) {
+                const revealCorrectBtn = document.getElementById('revealCorrectBtn');
+                const revealWrongBtn = document.getElementById('revealWrongBtn');
 
-                if (!correctBtn.classList.contains('hidden')) {
+                if (!revealCorrectBtn.classList.contains('hidden') &&
+                    !revealWrongBtn.classList.contains('hidden')) {
                     if (e.key === 'ArrowUp') {
                         e.preventDefault();
-                        this.answerCorrect();
+                        this.finalAnswerCorrect();
+                        return;
                     } else if (e.key === 'ArrowDown') {
                         e.preventDefault();
-                        this.answerWrong();
+                        this.finalAnswerWrong();
+                        return;
                     }
                 }
             }
 
-            // Pilar för Final Jeopardy wager
-            if (!finalModal.classList.contains('hidden') &&
-                !document.getElementById('finalWagerSection').classList.contains('hidden')) {
+            // Final Jeopardy Wager
+            if (!finalWagerSection.classList.contains('hidden') &&
+                !finalModal.classList.contains('hidden')) {
                 const input = document.getElementById('finalWagerInput');
                 if (e.key === 'ArrowUp') {
                     e.preventDefault();
                     input.value = Math.min(parseInt(input.max), parseInt(input.value || 0) + 100);
+                    return;
                 } else if (e.key === 'ArrowDown') {
                     e.preventDefault();
                     input.value = Math.max(0, parseInt(input.value || 0) - 100);
+                    return;
                 } else if (e.key === 'Enter') {
                     e.preventDefault();
                     this.confirmWager();
+                    return;
                 }
             }
 
-            // Uppåt/nedåt för Final reveal
-            if (!document.getElementById('finalRevealSection').classList.contains('hidden')) {
-                const correctBtn = document.getElementById('revealCorrectBtn');
-                if (!correctBtn.classList.contains('hidden')) {
+            // Vanlig frågemodal
+            if (!modal.classList.contains('hidden')) {
+                // Högerpil för navigering
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (!this.answerShown) {
+                        this.showAnswer();
+                    } else {
+                        this.closeQuestionModal();
+                    }
+                    return;
+                }
+
+                // Uppåt/nedåt pilar för rätt/fel
+                const correctBtn = document.getElementById('correctBtn');
+                const wrongBtn = document.getElementById('wrongBtn');
+
+                // Kolla om knapparna är synliga (inte hidden)
+                const correctVisible = !correctBtn.classList.contains('hidden');
+                const wrongVisible = !wrongBtn.classList.contains('hidden');
+
+                if (correctVisible && wrongVisible) {
                     if (e.key === 'ArrowUp') {
                         e.preventDefault();
-                        this.finalAnswerCorrect();
+                        this.answerCorrect();
+                        return;
                     } else if (e.key === 'ArrowDown') {
                         e.preventDefault();
-                        this.finalAnswerWrong();
+                        this.answerWrong();
+                        return;
                     }
                 }
             }
