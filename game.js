@@ -16,6 +16,7 @@ class JeopardyGame {
         this.buzzerActive = false;
         this.buzzerWinner = null;
         this.buzzerAttempts = [];
+        this.autoCloseTimeout = null;
 
         this.init();
     }
@@ -170,6 +171,12 @@ class JeopardyGame {
     }
 
     closeQuestionModal() {
+        // Rensa auto-stäng timer om den finns
+        if (this.autoCloseTimeout) {
+            clearTimeout(this.autoCloseTimeout);
+            this.autoCloseTimeout = null;
+        }
+
         document.getElementById('questionModal').classList.add('hidden');
         this.buzzerActive = false;
         this.buzzerWinner = null;
@@ -288,6 +295,21 @@ class JeopardyGame {
         location.reload();
     }
 
+    debugClearBoard() {
+        const roundKey = this.currentRound === 1 ? 'round1' : 'round2';
+        // Markera alla frågor som besvarade
+        for (let col = 0; col < 6; col++) {
+            for (let row = 0; row < 5; row++) {
+                const questionId = `${col}-${row}`;
+                if (!this.answeredQuestions[roundKey].includes(questionId)) {
+                    this.answeredQuestions[roundKey].push(questionId);
+                }
+            }
+        }
+        this.renderBoard();
+        this.checkRoundComplete();
+    }
+
     updatePlayerScores() {
         this.players.forEach((player, index) => {
             const scoreElement = document.getElementById(`player${index + 1}`)
@@ -310,6 +332,14 @@ class JeopardyGame {
         // Frågemodal-knappar
         document.getElementById('showAnswerBtn').onclick = () => {
             document.getElementById('questionAnswer').classList.remove('hidden');
+
+            // Markera frågan som besvarad
+            this.markQuestionAsAnswered();
+
+            // Stäng automatiskt efter 5 sekunder
+            this.autoCloseTimeout = setTimeout(() => {
+                this.closeQuestionModal();
+            }, 5000);
         };
 
         document.getElementById('correctBtn').onclick = () => {
@@ -340,6 +370,11 @@ class JeopardyGame {
         // Nytt spel
         document.getElementById('newGameBtn').onclick = () => {
             this.newGame();
+        };
+
+        // Debug: Töm brädet
+        document.getElementById('debugClearBoardBtn').onclick = () => {
+            this.debugClearBoard();
         };
     }
 }
