@@ -1,7 +1,9 @@
 // Frågor för Jeopardy-spelet
-// Två omgångar: Jeopardy (omgång 1) och Double Jeopardy (omgång 2)
+// Tre omgångar: Jeopardy (omgång 1), Double Jeopardy (omgång 2) och Triple Jeopardy (omgång 3)
 // Värden: Omgång 1: 100, 200, 300, 400, 500
-// Värden: Omgång 2: 400, 800, 1200, 1600, 2000
+// Värden: Omgång 2: 200, 400, 600, 800, 1000
+// Värden: Omgång 3: 300, 600, 900, 1200, 1500
+// Daily Doubles: Omgång 1 (1 st), Omgång 2 (2 st), Omgång 3 (3 st)
 
 const gameData = {
     round1: {
@@ -62,7 +64,9 @@ const gameData = {
                 { value: 400, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
                 { value: 500, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
             ]
-        ]
+        ],
+        // Daily Double placeras slumpmässigt, här anges vilket index (col-row format)
+        dailyDoubles: ["2-3"] // 1 Daily Double i omgång 1
     },
     round2: {
         categories: [
@@ -76,53 +80,115 @@ const gameData = {
         questions: [
             // Kategori 1
             [
-                { value: 400, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
-                { value: 800, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
-                { value: 1200, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
-                { value: 1600, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
-                { value: 2000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+                { value: 200, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 400, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 800, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
             ],
             // Kategori 2
             [
-                { value: 400, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
-                { value: 800, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
-                { value: 1200, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
-                { value: 1600, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
-                { value: 2000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+                { value: 200, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 400, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 800, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
             ],
             // Kategori 3
             [
-                { value: 400, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
-                { value: 800, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
-                { value: 1200, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
-                { value: 1600, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
-                { value: 2000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+                { value: 200, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 400, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 800, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
             ],
             // Kategori 4
             [
-                { value: 400, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
-                { value: 800, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
-                { value: 1200, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
-                { value: 1600, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
-                { value: 2000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+                { value: 200, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 400, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 800, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
             ],
             // Kategori 5
             [
-                { value: 400, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
-                { value: 800, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
-                { value: 1200, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
-                { value: 1600, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
-                { value: 2000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+                { value: 200, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 400, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 800, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
             ],
             // Kategori 6
             [
-                { value: 400, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
-                { value: 800, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
-                { value: 1200, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
-                { value: 1600, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
-                { value: 2000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+                { value: 200, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 400, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 800, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1000, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
             ]
-        ]
+        ],
+        dailyDoubles: ["1-2", "4-4"] // 2 Daily Doubles i omgång 2
+    },
+    round3: {
+        categories: [
+            "Triple Kategori 1",
+            "Triple Kategori 2",
+            "Triple Kategori 3",
+            "Triple Kategori 4",
+            "Triple Kategori 5",
+            "Triple Kategori 6"
+        ],
+        questions: [
+            // Kategori 1
+            [
+                { value: 300, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 900, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 1200, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1500, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+            ],
+            // Kategori 2
+            [
+                { value: 300, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 900, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 1200, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1500, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+            ],
+            // Kategori 3
+            [
+                { value: 300, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 900, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 1200, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1500, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+            ],
+            // Kategori 4
+            [
+                { value: 300, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 900, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 1200, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1500, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+            ],
+            // Kategori 5
+            [
+                { value: 300, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 900, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 1200, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1500, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+            ],
+            // Kategori 6
+            [
+                { value: 300, question: "Platshållare fråga 1", answer: "Vad är svaret?" },
+                { value: 600, question: "Platshållare fråga 2", answer: "Vad är svaret?" },
+                { value: 900, question: "Platshållare fråga 3", answer: "Vad är svaret?" },
+                { value: 1200, question: "Platshållare fråga 4", answer: "Vad är svaret?" },
+                { value: 1500, question: "Platshållare fråga 5", answer: "Vad är svaret?" }
+            ]
+        ],
+        dailyDoubles: ["0-1", "3-3", "5-4"] // 3 Daily Doubles i omgång 3
     },
     final: {
         category: "Final Kategori",

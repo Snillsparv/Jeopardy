@@ -10,13 +10,15 @@ class JeopardyGame {
         ];
         this.answeredQuestions = {
             round1: [],
-            round2: []
+            round2: [],
+            round3: []
         };
         this.currentQuestion = null;
         this.buzzerActive = false;
         this.buzzerWinner = null;
         this.buzzerAttempts = [];
         this.autoCloseTimeout = null;
+        this.answerShown = false; // För högerpil-navigering
 
         this.init();
     }
@@ -25,14 +27,25 @@ class JeopardyGame {
         this.renderBoard();
         this.setupEventListeners();
         this.updatePlayerScores();
+        this.playIntroMusic();
+    }
+
+    playIntroMusic() {
+        // Försök spela intro-musik om filen finns
+        const audio = new Audio('jeopardy-intro.mp3');
+        audio.volume = 0.5;
+        audio.play().catch(() => {
+            // Om ljudfilen inte finns, fortsätt utan ljud
+            console.log('Intro-musik inte tillgänglig');
+        });
     }
 
     renderBoard() {
         const board = document.getElementById('gameBoard');
         board.innerHTML = '';
 
-        const currentData = this.currentRound === 1 ? gameData.round1 : gameData.round2;
-        const roundKey = this.currentRound === 1 ? 'round1' : 'round2';
+        const currentData = this.getCurrentRoundData();
+        const roundKey = `round${this.currentRound}`;
 
         // Rendera kategorier
         currentData.categories.forEach(category => {
@@ -50,12 +63,18 @@ class JeopardyGame {
                 questionDiv.className = 'question-cell';
 
                 const questionId = `${col}-${row}`;
+
+                // Kolla om det är en Daily Double
+                const isDailyDouble = currentData.dailyDoubles &&
+                                     currentData.dailyDoubles.includes(questionId);
+
                 if (this.answeredQuestions[roundKey].includes(questionId)) {
                     questionDiv.classList.add('answered');
                     questionDiv.textContent = '';
                 } else {
+                    // Visa poäng som vanligt (Daily Double avslöjas när man klickar)
                     questionDiv.textContent = question.value;
-                    questionDiv.onclick = () => this.selectQuestion(col, row);
+                    questionDiv.onclick = () => this.selectQuestion(col, row, isDailyDouble);
                 }
 
                 board.appendChild(questionDiv);
@@ -63,8 +82,14 @@ class JeopardyGame {
         }
     }
 
-    selectQuestion(col, row) {
-        const currentData = this.currentRound === 1 ? gameData.round1 : gameData.round2;
+    getCurrentRoundData() {
+        if (this.currentRound === 1) return gameData.round1;
+        if (this.currentRound === 2) return gameData.round2;
+        if (this.currentRound === 3) return gameData.round3;
+    }
+
+    selectQuestion(col, row, isDailyDouble) {
+        const currentData = this.getCurrentRoundData();
         const question = currentData.questions[col][row];
         const category = currentData.categories[col];
 
@@ -72,14 +97,54 @@ class JeopardyGame {
             col,
             row,
             data: question,
-            category
+            category,
+            isDailyDouble
         };
 
-        // Visa frågemodal
-        document.getElementById('questionValue').textContent = question.value + ' kr';
-        document.getElementById('questionCategory').textContent = category;
-        document.getElementById('questionText').textContent = question.question;
-        document.getElementById('questionAnswer').textContent = question.answer;
+        this.answerShown = false; // Återställ för högerpil-navigering
+
+        // Om det är Daily Double, visa det först
+        if (isDailyDouble) {
+            this.showDailyDouble();
+        } else {
+            this.showQuestion();
+        }
+    }
+
+    showDailyDouble() {
+        document.getElementById('questionValue').textContent = 'DAILY DOUBLE!';
+        document.getElementById('questionValue').style.color = '#ff6b6b';
+        document.getElementById('questionValue').style.fontSize = '4rem';
+        document.getElementById('questionCategory').textContent = this.currentQuestion.category;
+        document.getElementById('questionText').textContent =
+            'En spelare väljer insats och svarar ensam!';
+        document.getElementById('questionAnswer').classList.add('hidden');
+        document.getElementById('buzzerStatus').textContent = '';
+
+        document.getElementById('correctBtn').classList.add('hidden');
+        document.getElementById('wrongBtn').classList.add('hidden');
+        document.getElementById('questionModal').classList.remove('hidden');
+
+        // Ändra "Visa svar"-knappen till "Fortsätt"
+        document.getElementById('showAnswerBtn').textContent = 'Fortsätt';
+        document.getElementById('showAnswerBtn').onclick = () => {
+            this.showQuestion();
+        };
+    }
+
+    showQuestion() {
+        // Återställ Daily Double-styling
+        document.getElementById('questionValue').style.color = '#ffd700';
+        document.getElementById('questionValue').style.fontSize = '3rem';
+
+        document.getElementById('questionValue').textContent =
+            this.currentQuestion.data.value + ' kr';
+        document.getElementById('questionCategory').textContent =
+            this.currentQuestion.category;
+        document.getElementById('questionText').textContent =
+            this.currentQuestion.data.question;
+        document.getElementById('questionAnswer').textContent =
+            this.currentQuestion.data.answer;
         document.getElementById('buzzerStatus').textContent = 'Väntar på buzzer...';
 
         document.getElementById('questionAnswer').classList.add('hidden');
@@ -87,8 +152,29 @@ class JeopardyGame {
         document.getElementById('wrongBtn').classList.add('hidden');
         document.getElementById('questionModal').classList.remove('hidden');
 
-        // Aktivera buzzer
-        this.activateBuzzer();
+        // Återställ "Visa svar"-knappen
+        document.getElementById('showAnswerBtn').textContent = 'Visa svar';
+        document.getElementById('showAnswerBtn').onclick = () => {
+            this.showAnswer();
+        };
+
+        // Aktivera buzzer (om inte Daily Double)
+        if (!this.currentQuestion.isDailyDouble) {
+            this.activateBuzzer();
+        }
+    }
+
+    showAnswer() {
+        document.getElementById('questionAnswer').classList.remove('hidden');
+        this.answerShown = true;
+
+        // Markera frågan som besvarad
+        this.markQuestionAsAnswered();
+
+        // Stäng automatiskt efter 5 sekunder
+        this.autoCloseTimeout = setTimeout(() => {
+            this.closeQuestionModal();
+        }, 5000);
     }
 
     activateBuzzer() {
@@ -165,9 +251,11 @@ class JeopardyGame {
     }
 
     markQuestionAsAnswered() {
-        const roundKey = this.currentRound === 1 ? 'round1' : 'round2';
+        const roundKey = `round${this.currentRound}`;
         const questionId = `${this.currentQuestion.col}-${this.currentQuestion.row}`;
-        this.answeredQuestions[roundKey].push(questionId);
+        if (!this.answeredQuestions[roundKey].includes(questionId)) {
+            this.answeredQuestions[roundKey].push(questionId);
+        }
     }
 
     closeQuestionModal() {
@@ -181,6 +269,7 @@ class JeopardyGame {
         this.buzzerActive = false;
         this.buzzerWinner = null;
         this.currentQuestion = null;
+        this.answerShown = false;
 
         // Rensa alla spelarmarkeringar
         document.querySelectorAll('.player').forEach(p => {
@@ -195,21 +284,23 @@ class JeopardyGame {
     }
 
     checkRoundComplete() {
-        const roundKey = this.currentRound === 1 ? 'round1' : 'round2';
+        const roundKey = `round${this.currentRound}`;
         const totalQuestions = 30; // 6 kategorier * 5 frågor
 
         if (this.answeredQuestions[roundKey].length === totalQuestions) {
-            if (this.currentRound === 1) {
-                // Gå till omgång 2
+            if (this.currentRound < 3) {
+                // Gå till nästa omgång
                 setTimeout(() => {
-                    if (confirm('Omgång 1 är klar! Fortsätta till Double Jeopardy?')) {
-                        this.startRound2();
+                    const nextRound = this.currentRound + 1;
+                    const roundName = nextRound === 2 ? 'Double Jeopardy' : 'Triple Jeopardy';
+                    if (confirm(`Omgång ${this.currentRound} är klar! Fortsätta till ${roundName}?`)) {
+                        this.startNextRound();
                     }
                 }, 500);
             } else {
                 // Gå till Final Jeopardy
                 setTimeout(() => {
-                    if (confirm('Double Jeopardy är klar! Fortsätta till Final Jeopardy?')) {
+                    if (confirm('Triple Jeopardy är klar! Fortsätta till Final Jeopardy?')) {
                         this.startFinalJeopardy();
                     }
                 }, 500);
@@ -217,9 +308,11 @@ class JeopardyGame {
         }
     }
 
-    startRound2() {
-        this.currentRound = 2;
-        document.getElementById('roundIndicator').textContent = 'Omgång 2: Double Jeopardy';
+    startNextRound() {
+        this.currentRound++;
+        const roundNames = ['', 'Jeopardy', 'Double Jeopardy', 'Triple Jeopardy'];
+        document.getElementById('roundIndicator').textContent =
+            `Omgång ${this.currentRound}: ${roundNames[this.currentRound]}`;
         this.renderBoard();
     }
 
@@ -248,15 +341,9 @@ class JeopardyGame {
 
     finishGame() {
         // Hämta insatser och resultat
-        const wagers = [];
-        const results = [];
-
         for (let i = 0; i < 4; i++) {
             const wager = parseInt(document.getElementById(`wager${i + 1}`).value) || 0;
             const correct = document.getElementById(`finalCorrect${i + 1}`).checked;
-
-            wagers.push(wager);
-            results.push(correct);
 
             // Uppdatera poäng
             if (correct) {
@@ -296,7 +383,7 @@ class JeopardyGame {
     }
 
     debugClearBoard() {
-        const roundKey = this.currentRound === 1 ? 'round1' : 'round2';
+        const roundKey = `round${this.currentRound}`;
         // Markera alla frågor som besvarade
         for (let col = 0; col < 6; col++) {
             for (let row = 0; row < 5; row++) {
@@ -319,39 +406,45 @@ class JeopardyGame {
     }
 
     setupEventListeners() {
-        // Buzzer-tangenter
+        // Buzzer-tangenter och högerpil-navigering
         document.addEventListener('keydown', (e) => {
+            // Buzzer-tangenter
             if (this.buzzerActive) {
                 const playerIndex = this.players.findIndex(p => p.buzzerKey === e.key);
                 if (playerIndex !== -1) {
                     this.handleBuzzer(playerIndex);
                 }
             }
+
+            // Högerpil för navigering i frågemodal
+            if (e.key === 'ArrowRight') {
+                const modal = document.getElementById('questionModal');
+                if (!modal.classList.contains('hidden')) {
+                    e.preventDefault();
+
+                    if (!this.answerShown) {
+                        // Visa svar
+                        this.showAnswer();
+                    } else {
+                        // Stäng modalen
+                        this.closeQuestionModal();
+                    }
+                }
+            }
         });
 
-        // Frågemodal-knappar
-        document.getElementById('showAnswerBtn').onclick = () => {
-            document.getElementById('questionAnswer').classList.remove('hidden');
-
-            // Markera frågan som besvarad
-            this.markQuestionAsAnswered();
-
-            // Stäng automatiskt efter 5 sekunder
-            this.autoCloseTimeout = setTimeout(() => {
-                this.closeQuestionModal();
-            }, 5000);
+        // Stäng-knapp
+        document.getElementById('closeBtn').onclick = () => {
+            this.closeQuestionModal();
         };
 
+        // Rätt/Fel-knappar
         document.getElementById('correctBtn').onclick = () => {
             this.answerCorrect();
         };
 
         document.getElementById('wrongBtn').onclick = () => {
             this.answerWrong();
-        };
-
-        document.getElementById('closeBtn').onclick = () => {
-            this.closeQuestionModal();
         };
 
         // Final Jeopardy-knappar
