@@ -122,6 +122,20 @@ header {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
 }
 
+.player.owner {
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    position: relative;
+}
+
+.player.owner::before {
+    content: "👑";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 2rem;
+}
+
 @keyframes buzz {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
@@ -219,6 +233,34 @@ header {
     min-height: 30px;
 }
 
+.timer-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 15px 30px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.transition-content {
+    padding: 80px 60px !important;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.transition-text {
+    font-size: 3.5rem;
+    color: #ffd700;
+    text-align: center;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
 /* Buttons */
 .modal-buttons {
     display: flex;
@@ -311,6 +353,27 @@ header {
     width: 25px;
     height: 25px;
     cursor: pointer;
+}
+
+.wager-input-single {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.final-reveal {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.final-section {
+    text-align: center;
+    padding: 20px;
 }
 
 /* Responsiv design */

@@ -53,6 +53,7 @@
             <div class="modal-content">
                 <div class="question-value" id="questionValue"></div>
                 <div class="question-category" id="questionCategory"></div>
+                <div class="timer-display hidden" id="timerDisplay">⏱️ 10s</div>
                 <div class="question-text" id="questionText"></div>
                 <div class="question-answer hidden" id="questionAnswer"></div>
                 <div class="buzzer-status" id="buzzerStatus">Väntar på buzzer...</div>
@@ -65,47 +66,52 @@
             </div>
         </div>
 
+        <!-- Övergångsmodal -->
+        <div id="transitionModal" class="modal hidden">
+            <div class="modal-content transition-content">
+                <h2 id="transitionText" class="transition-text"></h2>
+            </div>
+        </div>
+
         <!-- Final Jeopardy Modal -->
         <div id="finalModal" class="modal hidden">
             <div class="modal-content final-modal">
                 <h2>FINAL JEOPARDY!</h2>
                 <div class="final-category" id="finalCategory"></div>
-                <div class="final-section">
-                    <h3>Spelare, placera era insatser!</h3>
-                    <div class="final-wagers">
-                        <div class="wager-input">
-                            <label>Spelare 1:</label>
-                            <input type="number" id="wager1" min="0">
-                        </div>
-                        <div class="wager-input">
-                            <label>Spelare 2:</label>
-                            <input type="number" id="wager2" min="0">
-                        </div>
-                        <div class="wager-input">
-                            <label>Spelare 3:</label>
-                            <input type="number" id="wager3" min="0">
-                        </div>
-                        <div class="wager-input">
-                            <label>Spelare 4:</label>
-                            <input type="number" id="wager4" min="0">
-                        </div>
+
+                <!-- Insatser en spelare i taget -->
+                <div id="finalWagerSection" class="final-section hidden">
+                    <h3 id="finalCurrentPlayer">Spelare X</h3>
+                    <p id="finalPlayerScore" style="font-size: 1.3rem; margin: 10px 0;">Poäng: 0 kr</p>
+                    <p id="finalMaxWager" style="font-size: 1.1rem; color: #ffd700; margin: 10px 0;">Max: 0 kr</p>
+                    <div class="wager-input-single">
+                        <label style="font-size: 1.2rem;">Välj insats (↑↓ för ±100 kr):</label>
+                        <input type="number" id="finalWagerInput" min="0" step="100"
+                            style="font-size: 1.5rem; padding: 10px; width: 200px; text-align: center; margin: 10px 0;">
                     </div>
-                    <button id="showFinalQuestionBtn" class="btn">Visa fråga</button>
+                    <button id="confirmWagerBtn" class="btn">OK (Enter)</button>
                 </div>
+
+                <!-- Fråga -->
                 <div class="final-question hidden" id="finalQuestionSection">
                     <div class="question-text" id="finalQuestionText"></div>
                     <button id="showFinalAnswerBtn" class="btn">Visa svar</button>
                 </div>
+
+                <!-- Svar -->
                 <div class="final-answer hidden" id="finalAnswerSection">
                     <div class="question-answer" id="finalAnswerText"></div>
-                    <h3>Markera vilka som svarade rätt:</h3>
-                    <div class="final-results">
-                        <label><input type="checkbox" id="finalCorrect1"> Spelare 1</label>
-                        <label><input type="checkbox" id="finalCorrect2"> Spelare 2</label>
-                        <label><input type="checkbox" id="finalCorrect3"> Spelare 3</label>
-                        <label><input type="checkbox" id="finalCorrect4"> Spelare 4</label>
+                </div>
+
+                <!-- Revealing spelares svar -->
+                <div id="finalRevealSection" class="final-reveal hidden">
+                    <h3 id="revealPlayerName">Spelare X</h3>
+                    <p id="revealWager" style="font-size: 1.5rem; color: #ffd700; margin: 20px 0;">Satsning: 0 kr</p>
+                    <p style="font-size: 1.2rem; margin: 20px 0;">Svarade spelaren rätt?</p>
+                    <div class="modal-buttons">
+                        <button id="revealCorrectBtn" class="btn btn-correct">Rätt (↑)</button>
+                        <button id="revealWrongBtn" class="btn btn-wrong">Fel (↓)</button>
                     </div>
-                    <button id="finishGameBtn" class="btn">Avsluta spel</button>
                 </div>
             </div>
         </div>
