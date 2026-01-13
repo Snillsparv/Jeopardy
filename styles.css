@@ -259,13 +259,27 @@ header {
 }
 
 .timer-display {
-    font-size: 2.5rem;
-    font-weight: bold;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
     margin: 20px 0;
     padding: 15px 30px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
-    display: inline-block;
+}
+
+.timer-bar {
+    width: 30px;
+    height: 50px;
+    background: #ffd700;
+    border-radius: 3px;
+    transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.timer-bar.off {
+    background: #333;
+    opacity: 0.3;
 }
 
 .transition-content {

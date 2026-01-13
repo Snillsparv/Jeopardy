@@ -295,14 +295,26 @@ class JeopardyGame {
         const modal = document.getElementById('questionModal');
         const modalContent = modal.querySelector('.modal-content');
 
-        // Sätt initial position och storlek
+        // Beräkna position för mitten av skärmen
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // Storlek som en beloppsruta (ca 200x120px)
+        const smallWidth = 200;
+        const smallHeight = 120;
+
+        // Centrera i mitten av skärmen
+        const startLeft = (viewportWidth - smallWidth) / 2;
+        const startTop = (viewportHeight - smallHeight) / 2;
+
+        // Sätt initial position och storlek (mitt på skärmen, liten)
         modal.classList.remove('hidden');
         modal.classList.add('animating-in');
         modalContent.style.position = 'fixed';
-        modalContent.style.left = rect.left + 'px';
-        modalContent.style.top = rect.top + 'px';
-        modalContent.style.width = rect.width + 'px';
-        modalContent.style.height = rect.height + 'px';
+        modalContent.style.left = startLeft + 'px';
+        modalContent.style.top = startTop + 'px';
+        modalContent.style.width = smallWidth + 'px';
+        modalContent.style.height = smallHeight + 'px';
         modalContent.style.maxWidth = 'none';
         modalContent.style.transform = 'none';
         modalContent.style.opacity = '1';
