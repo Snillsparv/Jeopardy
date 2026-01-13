@@ -99,6 +99,24 @@ header {
     justify-content: center;
 }
 
+.question-cell.value-revealing {
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 .question-cell:hover {
     transform: scale(1.05);
     background: #0808ff;

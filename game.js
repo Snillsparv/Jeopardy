@@ -32,6 +32,7 @@ class JeopardyGame {
         // Ämnesavslöjning
         this.revealedCategories = 0; // Hur många ämnen som är avslöjade
         this.categoriesRevealed = false; // Om alla ämnen är avslöjade
+        this.valuesRevealed = false; // Om beloppen är avslöjade
 
         this.init();
     }
@@ -41,6 +42,11 @@ class JeopardyGame {
         this.setupEventListeners();
         this.updatePlayerScores();
         this.playIntroMusic();
+
+        // Starta beloppsanimation efter kort delay
+        setTimeout(() => {
+            this.revealValuesInWave();
+        }, 500);
     }
 
     playIntroMusic() {
@@ -76,7 +82,7 @@ class JeopardyGame {
             board.appendChild(categoryDiv);
         });
 
-        // Rendera frågor (bara om alla ämnen är avslöjade)
+        // Rendera frågor
         for (let row = 0; row < 5; row++) {
             for (let col = 0; col < 6; col++) {
                 const question = currentData.questions[col][row];
@@ -95,8 +101,12 @@ class JeopardyGame {
                 } else if (this.categoriesRevealed) {
                     questionDiv.textContent = question.value;
                     questionDiv.onclick = () => this.selectQuestion(col, row, isDailyDouble);
+                } else if (this.valuesRevealed) {
+                    // Visa belopp men inte klickbart förrän kategorier är avslöjade
+                    questionDiv.textContent = question.value;
+                    questionDiv.style.cursor = 'default';
                 } else {
-                    // Om ämnen inte är avslöjade, visa inte frågor
+                    // Om belopp inte är avslöjade, visa tom ruta
                     questionDiv.textContent = '';
                     questionDiv.style.cursor = 'default';
                 }
@@ -115,7 +125,43 @@ class JeopardyGame {
         if (this.currentRound === 3) return gameData.round3;
     }
 
+    revealValuesInWave() {
+        if (this.valuesRevealed) return;
+
+        const currentData = this.getCurrentRoundData();
+        const questionCells = document.querySelectorAll('.question-cell');
+
+        // Animera fram varje fråga i en våg (från vänster till höger, rad för rad)
+        for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 6; col++) {
+                const index = row * 6 + col;
+                const cell = questionCells[index];
+                const question = currentData.questions[col][row];
+
+                // Fördröjning baserad på position (skapar våg-effekt)
+                const delay = (col * 100) + (row * 150);
+
+                setTimeout(() => {
+                    cell.classList.add('value-revealing');
+                    cell.textContent = question.value;
+
+                    // Ta bort animation-klass efter den är klar
+                    setTimeout(() => {
+                        cell.classList.remove('value-revealing');
+                    }, 500);
+                }, delay);
+            }
+        }
+
+        // Markera att alla belopp är avslöjade efter sista animationen
+        const totalDelay = (5 * 150) + (5 * 100) + 500;
+        setTimeout(() => {
+            this.valuesRevealed = true;
+        }, totalDelay);
+    }
+
     revealNextCategory() {
+        if (!this.valuesRevealed) return; // Kan inte avslöja kategorier förrän beloppen är klara
         if (this.categoriesRevealed) return;
 
         const currentData = this.getCurrentRoundData();
@@ -578,11 +624,17 @@ class JeopardyGame {
         document.getElementById('roundIndicator').textContent =
             `Omgång ${this.currentRound}: ${roundNames[this.currentRound]}`;
 
-        // Återställ kategoriavslöjning för nya omgången
+        // Återställ kategori- och beloppsavslöjning för nya omgången
         this.revealedCategories = 0;
         this.categoriesRevealed = false;
+        this.valuesRevealed = false;
 
         this.renderBoard();
+
+        // Starta beloppsanimation för nya omgången
+        setTimeout(() => {
+            this.revealValuesInWave();
+        }, 500);
     }
 
     startFinalJeopardy() {
@@ -732,6 +784,10 @@ class JeopardyGame {
     }
 
     debugClearBoard() {
+        // Avslöja allt först
+        this.valuesRevealed = true;
+        this.categoriesRevealed = true;
+
         const roundKey = `round${this.currentRound}`;
         for (let col = 0; col < 6; col++) {
             for (let row = 0; row < 5; row++) {
@@ -760,8 +816,9 @@ class JeopardyGame {
             const finalRevealSection = document.getElementById('finalRevealSection');
             const finalWagerSection = document.getElementById('finalWagerSection');
 
-            // Högerpil för kategoriavslöjning (när ingen modal är öppen)
+            // Högerpil för kategoriavslöjning (när ingen modal är öppen och belopp är avslöjade)
             if (e.key === 'ArrowRight' &&
+                this.valuesRevealed &&
                 !this.categoriesRevealed &&
                 modal.classList.contains('hidden') &&
                 finalModal.classList.contains('hidden')) {
