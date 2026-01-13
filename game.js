@@ -885,19 +885,23 @@ class JeopardyGame {
     }
 
     setPlayerFaces(winnerIndex = null) {
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+
         this.players.forEach((player, index) => {
             const imageElement = document.getElementById(`player${index + 1}-image`);
             if (!imageElement) return;
 
+            const playerName = playerNames[index];
+
             if (winnerIndex === null) {
                 // Alla neutrala
-                imageElement.src = `images/player${index + 1}-neutral.jpg`;
+                imageElement.src = `images/${playerName}.png`;
             } else if (index === winnerIndex) {
                 // Vinnaren är glad
-                imageElement.src = `images/player${index + 1}-happy.jpg`;
+                imageElement.src = `images/${playerName}_glad.png`;
             } else {
                 // Resten är ledsna
-                imageElement.src = `images/player${index + 1}-sad.jpg`;
+                imageElement.src = `images/${playerName}_ledsen.png`;
             }
         });
     }
