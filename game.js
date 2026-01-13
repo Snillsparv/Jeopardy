@@ -295,29 +295,9 @@ class JeopardyGame {
         const modal = document.getElementById('questionModal');
         const modalContent = modal.querySelector('.modal-content');
 
-        // Beräkna position för mitten av skärmen
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // Storlek som en beloppsruta (ca 200x120px)
-        const smallWidth = 200;
-        const smallHeight = 120;
-
-        // Centrera i mitten av skärmen
-        const startLeft = (viewportWidth - smallWidth) / 2;
-        const startTop = (viewportHeight - smallHeight) / 2;
-
-        // Sätt initial position och storlek (mitt på skärmen, liten)
+        // Visa modalen dold först
         modal.classList.remove('hidden');
-        modal.classList.add('animating-in');
-        modalContent.style.position = 'fixed';
-        modalContent.style.left = startLeft + 'px';
-        modalContent.style.top = startTop + 'px';
-        modalContent.style.width = smallWidth + 'px';
-        modalContent.style.height = smallHeight + 'px';
-        modalContent.style.maxWidth = 'none';
-        modalContent.style.transform = 'none';
-        modalContent.style.opacity = '1';
+        modal.style.opacity = '0';
 
         // Visa frågan
         if (isDailyDouble) {
@@ -326,25 +306,24 @@ class JeopardyGame {
             this.showQuestion();
         }
 
-        // Trigga animation efter ett kort delay
+        // Starta från en mycket liten ruta i mitten av skärmen
+        modalContent.style.transform = 'scale(0.1)';
+        modalContent.style.transition = 'none';
+        modal.style.opacity = '1';
+
+        // Trigga zoom-animation efter ett kort delay
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                modal.classList.remove('animating-in');
-                modal.classList.add('animating-to-center');
-                modalContent.style.position = '';
-                modalContent.style.left = '';
-                modalContent.style.top = '';
-                modalContent.style.width = '';
-                modalContent.style.height = '';
-                modalContent.style.maxWidth = '';
-                modalContent.style.transform = '';
+                modalContent.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                modalContent.style.transform = 'scale(1)';
             });
         });
 
-        // Ta bort animation-klasser efter animationen
+        // Rensa styles efter animationen
         setTimeout(() => {
-            modal.classList.remove('animating-to-center');
-        }, 500);
+            modalContent.style.transition = '';
+            modalContent.style.transform = '';
+        }, 600);
     }
 
     showDailyDouble() {
@@ -951,10 +930,20 @@ class JeopardyGame {
 
             // Vanlig frågemodal
             if (!modal.classList.contains('hidden')) {
-                // Högerpil för att stänga
+                // Högerpil - rätt svar om någon har buzzat, annars stäng
                 if (e.key === 'ArrowRight') {
                     e.preventDefault();
-                    this.closeQuestionModal();
+
+                    const correctBtn = document.getElementById('correctBtn');
+                    const wrongBtn = document.getElementById('wrongBtn');
+
+                    // Om rätt/fel-knapparna är synliga (någon har buzzat), markera som rätt
+                    if (correctBtn && !correctBtn.classList.contains('hidden')) {
+                        this.answerCorrect();
+                    } else {
+                        // Annars stäng frågan
+                        this.closeQuestionModal();
+                    }
                     return;
                 }
 

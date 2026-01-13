@@ -210,10 +210,6 @@ header {
     text-align: center;
 }
 
-.modal.animating-to-center .modal-content {
-    transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
 .final-modal {
     max-width: 1000px;
 }
