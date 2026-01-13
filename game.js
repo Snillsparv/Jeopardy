@@ -415,18 +415,18 @@ class JeopardyGame {
     startQuestionTimer() {
         this.clearTimers();
         this.timeRemaining = 10;
-        this.updateTimerDisplay();
-        document.getElementById('timerDisplay').classList.remove('hidden');
+        // Ingen synlig timer under frågan, bara intern nedräkning
+        document.getElementById('timerDisplay').classList.add('hidden');
 
         this.timerInterval = setInterval(() => {
             this.timeRemaining--;
-            this.updateTimerDisplay();
 
             if (this.timeRemaining <= 0) {
                 this.clearTimers();
-                // Automatiskt visa svar efter 10 sekunder
+                // Automatiskt stäng frågan efter 10 sekunder
                 if (!this.answerShown) {
-                    this.showAnswer();
+                    this.markQuestionAsAnswered();
+                    this.closeQuestionModal();
                 }
             }
         }, 1000);
@@ -435,6 +435,8 @@ class JeopardyGame {
     startAnswerTimer() {
         this.clearTimers();
         this.timeRemaining = 7;
+        this.totalTime = 7;
+        this.createTimerBars(7);
         this.updateTimerDisplay();
         document.getElementById('timerDisplay').classList.remove('hidden');
 
@@ -452,18 +454,41 @@ class JeopardyGame {
         }, 1000);
     }
 
+    createTimerBars(count) {
+        const timerEl = document.getElementById('timerDisplay');
+        timerEl.innerHTML = ''; // Rensa gamla streck
+
+        // Skapa streck
+        for (let i = 0; i < count; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'timer-bar';
+            bar.dataset.index = i;
+            timerEl.appendChild(bar);
+        }
+    }
+
     updateTimerDisplay() {
         const timerEl = document.getElementById('timerDisplay');
-        timerEl.textContent = `⏱️ ${this.timeRemaining}s`;
+        const bars = timerEl.querySelectorAll('.timer-bar');
+        const totalBars = bars.length;
 
-        // Färgkodning
-        if (this.timeRemaining <= 3) {
-            timerEl.style.color = '#ff6b6b';
-        } else if (this.timeRemaining <= 5) {
-            timerEl.style.color = '#ffa500';
-        } else {
-            timerEl.style.color = '#90EE90';
-        }
+        if (totalBars === 0) return;
+
+        // Beräkna hur många par som ska släckas
+        // Släck från båda hållen samtidigt, symmetriskt
+        const barsToKeepLit = this.timeRemaining;
+        const pairsToTurnOff = Math.floor((totalBars - barsToKeepLit) / 2);
+
+        bars.forEach((bar, index) => {
+            // Släck från båda kanter samtidigt
+            // Vänster: 0 till pairsToTurnOff-1
+            // Höger: totalBars-pairsToTurnOff till totalBars-1
+            if (index < pairsToTurnOff || index >= totalBars - pairsToTurnOff) {
+                bar.classList.add('off');
+            } else {
+                bar.classList.remove('off');
+            }
+        });
     }
 
     clearTimers() {
