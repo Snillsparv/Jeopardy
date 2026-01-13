@@ -126,38 +126,77 @@ class JeopardyGame {
     }
 
     revealValuesInWave() {
-        if (this.valuesRevealed) return;
+        if (this.valuesRevealed) {
+            console.log('Values already revealed, skipping animation');
+            return;
+        }
 
         const currentData = this.getCurrentRoundData();
-        const questionCells = document.querySelectorAll('.question-cell');
 
-        // Animera fram varje fråga i en våg (från vänster till höger, rad för rad)
-        for (let row = 0; row < 5; row++) {
-            for (let col = 0; col < 6; col++) {
-                const index = row * 6 + col;
-                const cell = questionCells[index];
-                const question = currentData.questions[col][row];
+        if (!currentData) {
+            console.error('Could not get current round data');
+            return;
+        }
 
-                // Fördröjning baserad på position (skapar våg-effekt)
-                const delay = (col * 100) + (row * 150);
+        // Vänta lite extra för att säkerställa att DOM är redo
+        setTimeout(() => {
+            const questionCells = document.querySelectorAll('.question-cell');
+            console.log('Starting wave animation, found', questionCells.length, 'cells');
+
+            if (questionCells.length !== 30) {
+                console.error('Expected 30 cells, found', questionCells.length);
+            }
+
+            // Animera fram varje fråga i en våg (från vänster till höger, rad för rad)
+            const animations = [];
+
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 6; col++) {
+                    const index = row * 6 + col;
+                    const delay = (col * 100) + (row * 150);
+
+                    animations.push({
+                        index,
+                        row,
+                        col,
+                        delay
+                    });
+                }
+            }
+
+            // Kör alla animationer
+            animations.forEach(anim => {
+                const cell = questionCells[anim.index];
+                const question = currentData.questions[anim.col][anim.row];
+
+                if (!cell) {
+                    console.error('Cell not found at index', anim.index);
+                    return;
+                }
+
+                if (!question) {
+                    console.error('Question not found at col:', anim.col, 'row:', anim.row);
+                    return;
+                }
 
                 setTimeout(() => {
+                    console.log('Animating cell', anim.index, 'with value', question.value);
                     cell.classList.add('value-revealing');
-                    cell.textContent = question.value;
+                    cell.textContent = String(question.value);
 
-                    // Ta bort animation-klass efter den är klar
                     setTimeout(() => {
                         cell.classList.remove('value-revealing');
                     }, 500);
-                }, delay);
-            }
-        }
+                }, anim.delay);
+            });
 
-        // Markera att alla belopp är avslöjade efter sista animationen
-        const totalDelay = (5 * 150) + (5 * 100) + 500;
-        setTimeout(() => {
-            this.valuesRevealed = true;
-        }, totalDelay);
+            // Markera att alla belopp är avslöjade efter sista animationen
+            const maxDelay = Math.max(...animations.map(a => a.delay));
+            setTimeout(() => {
+                this.valuesRevealed = true;
+                console.log('All values revealed! valuesRevealed =', this.valuesRevealed);
+            }, maxDelay + 600);
+        }, 100);
     }
 
     revealNextCategory() {
