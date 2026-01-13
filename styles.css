@@ -178,6 +178,26 @@ header {
     color: #ffd700;
 }
 
+.player-name-1 {
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+}
+
+.player-name-2 {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 1.6rem;
+}
+
+.player-name-3 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.7rem;
+}
+
+.player-name-4 {
+    font-family: 'Indie Flower', cursive;
+    font-size: 1.7rem;
+}
+
 .player-score {
     font-size: 2rem;
     font-weight: bold;
