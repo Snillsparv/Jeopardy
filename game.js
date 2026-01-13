@@ -182,11 +182,16 @@ class JeopardyGame {
                 setTimeout(() => {
                     console.log('Animating cell', anim.index, 'with value', question.value);
                     cell.classList.add('value-revealing');
-                    cell.textContent = String(question.value);
 
+                    // Byt text i mitten av rotationen (0.3s)
+                    setTimeout(() => {
+                        cell.textContent = String(question.value);
+                    }, 300);
+
+                    // Ta bort animation-klass när den är klar
                     setTimeout(() => {
                         cell.classList.remove('value-revealing');
-                    }, 500);
+                    }, 600);
                 }, anim.delay);
             });
 
