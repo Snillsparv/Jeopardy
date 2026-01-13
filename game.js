@@ -695,6 +695,7 @@ class JeopardyGame {
 
         document.getElementById('finalModal').classList.remove('hidden');
         document.getElementById('finalWagerSection').classList.remove('hidden');
+        document.getElementById('finalCategorySection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.add('hidden');
         document.getElementById('finalAnswerSection').classList.add('hidden');
         document.getElementById('finalRevealSection').classList.add('hidden');
@@ -734,6 +735,12 @@ class JeopardyGame {
 
     showFinalQuestion() {
         document.getElementById('finalWagerSection').classList.add('hidden');
+        document.getElementById('finalCategorySection').classList.remove('hidden');
+        document.getElementById('finalQuestionSection').classList.add('hidden');
+    }
+
+    showActualFinalQuestion() {
+        document.getElementById('finalCategorySection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.remove('hidden');
     }
 
@@ -952,18 +959,35 @@ class JeopardyGame {
             }
         });
 
-        document.getElementById('closeBtn').onclick = () => this.closeQuestionModal();
-        document.getElementById('correctBtn').onclick = () => this.answerCorrect();
-        document.getElementById('wrongBtn').onclick = () => this.answerWrong();
+        // Sätt event listeners - skydda mot null
+        const closeBtn = document.getElementById('closeBtn');
+        const correctBtn = document.getElementById('correctBtn');
+        const wrongBtn = document.getElementById('wrongBtn');
+        const showAnswerBtn = document.getElementById('showAnswerBtn');
 
-        document.getElementById('showFinalQuestionBtn').onclick = () => this.showFinalQuestion();
-        document.getElementById('showFinalAnswerBtn').onclick = () => this.showFinalAnswer();
-        document.getElementById('confirmWagerBtn').onclick = () => this.confirmWager();
-        document.getElementById('revealCorrectBtn').onclick = () => this.finalAnswerCorrect();
-        document.getElementById('revealWrongBtn').onclick = () => this.finalAnswerWrong();
+        if (closeBtn) closeBtn.onclick = () => this.closeQuestionModal();
+        if (correctBtn) correctBtn.onclick = () => this.answerCorrect();
+        if (wrongBtn) wrongBtn.onclick = () => this.answerWrong();
 
-        document.getElementById('newGameBtn').onclick = () => this.newGame();
-        document.getElementById('debugClearBoardBtn').onclick = () => this.debugClearBoard();
+        // Final Jeopardy buttons
+        const showFinalQuestionBtn = document.getElementById('showFinalQuestionBtn');
+        const showFinalAnswerBtn = document.getElementById('showFinalAnswerBtn');
+        const confirmWagerBtn = document.getElementById('confirmWagerBtn');
+        const revealCorrectBtn = document.getElementById('revealCorrectBtn');
+        const revealWrongBtn = document.getElementById('revealWrongBtn');
+
+        if (showFinalQuestionBtn) showFinalQuestionBtn.onclick = () => this.showActualFinalQuestion();
+        if (showFinalAnswerBtn) showFinalAnswerBtn.onclick = () => this.showFinalAnswer();
+        if (confirmWagerBtn) confirmWagerBtn.onclick = () => this.confirmWager();
+        if (revealCorrectBtn) revealCorrectBtn.onclick = () => this.finalAnswerCorrect();
+        if (revealWrongBtn) revealWrongBtn.onclick = () => this.finalAnswerWrong();
+
+        // Other buttons
+        const newGameBtn = document.getElementById('newGameBtn');
+        const debugClearBoardBtn = document.getElementById('debugClearBoardBtn');
+
+        if (newGameBtn) newGameBtn.onclick = () => this.newGame();
+        if (debugClearBoardBtn) debugClearBoardBtn.onclick = () => this.debugClearBoard();
     }
 }
 
