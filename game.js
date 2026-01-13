@@ -332,6 +332,9 @@ class JeopardyGame {
         document.getElementById('questionValue').style.fontSize = '4rem';
         document.getElementById('questionCategory').textContent = this.currentQuestion.category;
 
+        // Sätt alla spelare till neutrala när Daily Double visas
+        this.setPlayerFaces(null);
+
         const ownerName = this.currentOwner !== null ? this.players[this.currentOwner].name : 'Ingen';
         const ownerScore = this.currentOwner !== null ? this.players[this.currentOwner].score : 0;
         const maxValue = this.currentQuestion.data.value;
@@ -398,6 +401,9 @@ class JeopardyGame {
         document.getElementById('correctBtn').classList.add('hidden');
         document.getElementById('wrongBtn').classList.add('hidden');
 
+        // Sätt alla spelare till neutrala när ny fråga visas
+        this.setPlayerFaces(null);
+
         // Aktivera buzzer och starta 10-sekunders timer
         this.activateBuzzer();
         this.startQuestionTimer();
@@ -416,6 +422,8 @@ class JeopardyGame {
                 this.clearTimers();
                 // Automatiskt stäng frågan efter 10 sekunder
                 if (!this.answerShown) {
+                    // Ingen lyckas svara - alla blir neutrala
+                    this.setPlayerFaces(null);
                     this.markQuestionAsAnswered();
                     this.closeQuestionModal();
                 }
@@ -546,20 +554,30 @@ class JeopardyGame {
     answerCorrect() {
         this.clearTimers();
 
+        let winnerIndex = null;
+
         if (this.buzzerWinner === null && this.currentQuestion.isDailyDouble && this.currentOwner !== null) {
             // Daily Double
             const wager = this.currentQuestion.wager || this.currentQuestion.data.value;
             this.players[this.currentOwner].score += wager;
             this.currentOwner = this.currentOwner; // Behåller äganderätten
+            winnerIndex = this.currentOwner;
         } else if (this.buzzerWinner !== null) {
             // Vanlig fråga
             const value = this.currentQuestion.data.value;
             this.players[this.buzzerWinner].score += value;
             this.currentOwner = this.buzzerWinner; // Ny ägare!
+            winnerIndex = this.buzzerWinner;
         }
 
         this.updatePlayerScores();
         this.updateOwnerDisplay();
+
+        // Visa vinnaren glad, resten ledsna
+        if (winnerIndex !== null) {
+            this.setPlayerFaces(winnerIndex);
+        }
+
         this.markQuestionAsAnswered();
         this.closeQuestionModal();
     }
@@ -572,6 +590,10 @@ class JeopardyGame {
             const wager = this.currentQuestion.wager || this.currentQuestion.data.value;
             this.players[this.currentOwner].score -= wager;
             this.updatePlayerScores();
+
+            // Alla blir neutrala när Daily Double misslyckas
+            this.setPlayerFaces(null);
+
             this.markQuestionAsAnswered();
             this.closeQuestionModal();
         } else if (this.buzzerWinner !== null) {
@@ -593,6 +615,9 @@ class JeopardyGame {
                 // Starta ny timer
                 this.startQuestionTimer();
             } else {
+                // Alla har försökt och ingen lyckas - alla blir neutrala
+                this.setPlayerFaces(null);
+
                 this.markQuestionAsAnswered();
                 this.closeQuestionModal();
             }
@@ -856,6 +881,24 @@ class JeopardyGame {
             const scoreElement = document.getElementById(`player${index + 1}`)
                 .querySelector('.player-score');
             scoreElement.textContent = player.score + ' kr';
+        });
+    }
+
+    setPlayerFaces(winnerIndex = null) {
+        this.players.forEach((player, index) => {
+            const imageElement = document.getElementById(`player${index + 1}-image`);
+            if (!imageElement) return;
+
+            if (winnerIndex === null) {
+                // Alla neutrala
+                imageElement.src = `images/player${index + 1}-neutral.jpg`;
+            } else if (index === winnerIndex) {
+                // Vinnaren är glad
+                imageElement.src = `images/player${index + 1}-happy.jpg`;
+            } else {
+                // Resten är ledsna
+                imageElement.src = `images/player${index + 1}-sad.jpg`;
+            }
         });
     }
 
