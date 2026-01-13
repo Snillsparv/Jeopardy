@@ -29,6 +29,10 @@ class JeopardyGame {
         this.finalWagers = [0, 0, 0, 0];
         this.finalCurrentPlayer = 0;
 
+        // Ämnesavslöjning
+        this.revealedCategories = 0; // Hur många ämnen som är avslöjade
+        this.categoriesRevealed = false; // Om alla ämnen är avslöjade
+
         this.init();
     }
 
@@ -55,19 +59,31 @@ class JeopardyGame {
         const roundKey = `round${this.currentRound}`;
 
         // Rendera kategorier
-        currentData.categories.forEach(category => {
+        currentData.categories.forEach((category, index) => {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'category';
-            categoryDiv.textContent = category;
+            categoryDiv.dataset.categoryIndex = index;
+
+            // Visa antingen "JEOPARDY" eller ämnet beroende på om det är avslöjat
+            if (this.categoriesRevealed || index < this.revealedCategories) {
+                categoryDiv.textContent = category;
+                categoryDiv.classList.add('revealed');
+            } else {
+                categoryDiv.textContent = 'JEOPARDY';
+                categoryDiv.style.color = '#ffd700';
+            }
+
             board.appendChild(categoryDiv);
         });
 
-        // Rendera frågor
+        // Rendera frågor (bara om alla ämnen är avslöjade)
         for (let row = 0; row < 5; row++) {
             for (let col = 0; col < 6; col++) {
                 const question = currentData.questions[col][row];
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question-cell';
+                questionDiv.dataset.col = col;
+                questionDiv.dataset.row = row;
 
                 const questionId = `${col}-${row}`;
                 const isDailyDouble = currentData.dailyDoubles &&
@@ -76,9 +92,13 @@ class JeopardyGame {
                 if (this.answeredQuestions[roundKey].includes(questionId)) {
                     questionDiv.classList.add('answered');
                     questionDiv.textContent = '';
-                } else {
+                } else if (this.categoriesRevealed) {
                     questionDiv.textContent = question.value;
                     questionDiv.onclick = () => this.selectQuestion(col, row, isDailyDouble);
+                } else {
+                    // Om ämnen inte är avslöjade, visa inte frågor
+                    questionDiv.textContent = '';
+                    questionDiv.style.cursor = 'default';
                 }
 
                 board.appendChild(questionDiv);
@@ -93,6 +113,49 @@ class JeopardyGame {
         if (this.currentRound === 1) return gameData.round1;
         if (this.currentRound === 2) return gameData.round2;
         if (this.currentRound === 3) return gameData.round3;
+    }
+
+    revealNextCategory() {
+        if (this.categoriesRevealed) return;
+
+        const currentData = this.getCurrentRoundData();
+        if (this.revealedCategories >= currentData.categories.length) {
+            this.categoriesRevealed = true;
+            this.renderBoard();
+            return;
+        }
+
+        // Hitta kategori-diven som ska avslöjas
+        const categoryIndex = this.revealedCategories;
+        const categoryDivs = document.querySelectorAll('.category');
+        const categoryDiv = categoryDivs[categoryIndex];
+
+        if (categoryDiv) {
+            // Lägg till rotation-animation
+            categoryDiv.classList.add('flipping');
+
+            // Efter halva animationen (0.3s), byt text
+            setTimeout(() => {
+                categoryDiv.textContent = currentData.categories[categoryIndex];
+                categoryDiv.style.color = 'white';
+            }, 300);
+
+            // När animationen är klar, ta bort class
+            setTimeout(() => {
+                categoryDiv.classList.remove('flipping');
+                categoryDiv.classList.add('revealed');
+            }, 600);
+        }
+
+        this.revealedCategories++;
+
+        // Om alla kategorier är avslöjade, visa frågor
+        if (this.revealedCategories >= currentData.categories.length) {
+            setTimeout(() => {
+                this.categoriesRevealed = true;
+                this.renderBoard();
+            }, 700);
+        }
     }
 
     updateOwnerDisplay() {
@@ -120,15 +183,69 @@ class JeopardyGame {
 
         this.answerShown = false;
 
+        // Hitta frågekortet och få dess position
+        const questionCells = document.querySelectorAll('.question-cell');
+        const questionIndex = row * 6 + col;
+        const questionCell = questionCells[questionIndex];
+
+        if (questionCell) {
+            const rect = questionCell.getBoundingClientRect();
+            this.animateQuestionFromPosition(rect, isDailyDouble);
+        } else {
+            // Fallback om vi inte hittar elementet
+            if (isDailyDouble) {
+                this.showDailyDouble();
+            } else {
+                this.showQuestion();
+            }
+        }
+    }
+
+    animateQuestionFromPosition(rect, isDailyDouble) {
+        const modal = document.getElementById('questionModal');
+        const modalContent = modal.querySelector('.modal-content');
+
+        // Sätt initial position och storlek
+        modal.classList.remove('hidden');
+        modal.classList.add('animating-in');
+        modalContent.style.position = 'fixed';
+        modalContent.style.left = rect.left + 'px';
+        modalContent.style.top = rect.top + 'px';
+        modalContent.style.width = rect.width + 'px';
+        modalContent.style.height = rect.height + 'px';
+        modalContent.style.maxWidth = 'none';
+        modalContent.style.transform = 'none';
+        modalContent.style.opacity = '1';
+
+        // Visa frågan
         if (isDailyDouble) {
             this.showDailyDouble();
         } else {
             this.showQuestion();
         }
+
+        // Trigga animation efter ett kort delay
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                modal.classList.remove('animating-in');
+                modal.classList.add('animating-to-center');
+                modalContent.style.position = '';
+                modalContent.style.left = '';
+                modalContent.style.top = '';
+                modalContent.style.width = '';
+                modalContent.style.height = '';
+                modalContent.style.maxWidth = '';
+                modalContent.style.transform = '';
+            });
+        });
+
+        // Ta bort animation-klasser efter animationen
+        setTimeout(() => {
+            modal.classList.remove('animating-to-center');
+        }, 500);
     }
 
     showDailyDouble() {
-        const modal = document.getElementById('questionModal');
         document.getElementById('questionValue').textContent = 'DAILY DOUBLE!';
         document.getElementById('questionValue').style.color = '#ff6b6b';
         document.getElementById('questionValue').style.fontSize = '4rem';
@@ -164,7 +281,6 @@ class JeopardyGame {
 
         document.getElementById('correctBtn').classList.add('hidden');
         document.getElementById('wrongBtn').classList.add('hidden');
-        modal.classList.remove('hidden');
 
         document.getElementById('showAnswerBtn').textContent = 'Fortsätt';
         document.getElementById('showAnswerBtn').onclick = () => {
@@ -210,7 +326,6 @@ class JeopardyGame {
         document.getElementById('questionAnswer').classList.add('hidden');
         document.getElementById('correctBtn').classList.add('hidden');
         document.getElementById('wrongBtn').classList.add('hidden');
-        document.getElementById('questionModal').classList.remove('hidden');
 
         document.getElementById('showAnswerBtn').textContent = 'Visa svar';
         document.getElementById('showAnswerBtn').onclick = () => {
@@ -462,6 +577,11 @@ class JeopardyGame {
         const roundNames = ['', 'Jeopardy', 'Double Jeopardy', 'Triple Jeopardy'];
         document.getElementById('roundIndicator').textContent =
             `Omgång ${this.currentRound}: ${roundNames[this.currentRound]}`;
+
+        // Återställ kategoriavslöjning för nya omgången
+        this.revealedCategories = 0;
+        this.categoriesRevealed = false;
+
         this.renderBoard();
     }
 
@@ -639,6 +759,16 @@ class JeopardyGame {
             const finalModal = document.getElementById('finalModal');
             const finalRevealSection = document.getElementById('finalRevealSection');
             const finalWagerSection = document.getElementById('finalWagerSection');
+
+            // Högerpil för kategoriavslöjning (när ingen modal är öppen)
+            if (e.key === 'ArrowRight' &&
+                !this.categoriesRevealed &&
+                modal.classList.contains('hidden') &&
+                finalModal.classList.contains('hidden')) {
+                e.preventDefault();
+                this.revealNextCategory();
+                return;
+            }
 
             // Buzzer-tangenter
             if (this.buzzerActive) {
