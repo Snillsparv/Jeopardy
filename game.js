@@ -362,6 +362,8 @@ class JeopardyGame {
                     min="0" max="${maxWager}" value="${Math.min(1000, maxWager)}"
                     step="100"
                     style="font-size: 1.5rem; padding: 10px; width: 200px; text-align: center;">
+                <br><br>
+                <button class="btn" onclick="game.showDailyDoubleQuestion(parseInt(document.getElementById('dailyDoubleWager').value) || 0)">Fortsätt</button>
             </div>
         `;
 
@@ -371,12 +373,6 @@ class JeopardyGame {
 
         document.getElementById('correctBtn').classList.add('hidden');
         document.getElementById('wrongBtn').classList.add('hidden');
-
-        document.getElementById('showAnswerBtn').textContent = 'Fortsätt';
-        document.getElementById('showAnswerBtn').onclick = () => {
-            const wager = parseInt(document.getElementById('dailyDoubleWager').value) || 0;
-            this.showDailyDoubleQuestion(wager);
-        };
     }
 
     showDailyDoubleQuestion(wager) {
@@ -387,18 +383,12 @@ class JeopardyGame {
         document.getElementById('questionValue').textContent = `DAILY DOUBLE: ${wager} kr`;
 
         document.getElementById('questionText').textContent = this.currentQuestion.data.question;
-        document.getElementById('questionAnswer').textContent = this.currentQuestion.data.answer;
         document.getElementById('questionAnswer').classList.add('hidden');
 
         document.getElementById('correctBtn').classList.remove('hidden');
         document.getElementById('wrongBtn').classList.remove('hidden');
         document.getElementById('buzzerStatus').textContent =
             `${this.players[this.currentOwner].name} svarar...`;
-
-        document.getElementById('showAnswerBtn').textContent = 'Visa svar';
-        document.getElementById('showAnswerBtn').onclick = () => {
-            this.showAnswer();
-        };
 
         // Starta 7-sekunders timer för svar
         this.startAnswerTimer();
@@ -410,17 +400,12 @@ class JeopardyGame {
         document.getElementById('questionValue').textContent = this.currentQuestion.data.value + ' kr';
         document.getElementById('questionCategory').textContent = this.currentQuestion.category;
         document.getElementById('questionText').textContent = this.currentQuestion.data.question;
-        document.getElementById('questionAnswer').textContent = this.currentQuestion.data.answer;
         document.getElementById('buzzerStatus').textContent = 'Väntar på buzzer...';
 
+        // Dölj allt som inte behövs
         document.getElementById('questionAnswer').classList.add('hidden');
         document.getElementById('correctBtn').classList.add('hidden');
         document.getElementById('wrongBtn').classList.add('hidden');
-
-        document.getElementById('showAnswerBtn').textContent = 'Visa svar';
-        document.getElementById('showAnswerBtn').onclick = () => {
-            this.showAnswer();
-        };
 
         // Aktivera buzzer och starta 10-sekunders timer
         this.activateBuzzer();
@@ -499,9 +484,7 @@ class JeopardyGame {
 
     showAnswer() {
         this.clearTimers();
-        document.getElementById('questionAnswer').classList.remove('hidden');
         this.answerShown = true;
-
         this.markQuestionAsAnswered();
 
         this.autoCloseTimeout = setTimeout(() => {
@@ -931,14 +914,10 @@ class JeopardyGame {
 
             // Vanlig frågemodal
             if (!modal.classList.contains('hidden')) {
-                // Högerpil för navigering
+                // Högerpil för att stänga
                 if (e.key === 'ArrowRight') {
                     e.preventDefault();
-                    if (!this.answerShown) {
-                        this.showAnswer();
-                    } else {
-                        this.closeQuestionModal();
-                    }
+                    this.closeQuestionModal();
                     return;
                 }
 
@@ -968,7 +947,6 @@ class JeopardyGame {
         const closeBtn = document.getElementById('closeBtn');
         const correctBtn = document.getElementById('correctBtn');
         const wrongBtn = document.getElementById('wrongBtn');
-        const showAnswerBtn = document.getElementById('showAnswerBtn');
 
         if (closeBtn) closeBtn.onclick = () => this.closeQuestionModal();
         if (correctBtn) correctBtn.onclick = () => this.answerCorrect();
