@@ -671,6 +671,9 @@ class JeopardyGame {
         const nextRound = this.currentRound + 1;
         const roundNames = ['', 'Jeopardy', 'Double Jeopardy', 'Triple Jeopardy'];
 
+        // Uppdatera ansikten baserat på placering
+        this.setPlayerFacesByPlacement();
+
         const modal = document.getElementById('transitionModal');
         document.getElementById('transitionText').textContent =
             `Nästa omgång: ${roundNames[nextRound]}!`;
@@ -835,6 +838,9 @@ class JeopardyGame {
     }
 
     showWinner() {
+        // Uppdatera ansikten baserat på placering
+        this.setPlayerFacesByPlacement();
+
         const sortedPlayers = [...this.players].sort((a, b) => b.score - a.score);
         const winner = sortedPlayers[0];
 
@@ -897,6 +903,39 @@ class JeopardyGame {
                 imageElement.src = `images/${playerName}_glad.png`;
             } else {
                 // Resten är ledsna
+                imageElement.src = `images/${playerName}_ledsen.png`;
+            }
+        });
+    }
+
+    setPlayerFacesByPlacement() {
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+
+        // Skapa kopia av spelare med deras index
+        const playersWithIndex = this.players.map((player, index) => ({
+            player,
+            index,
+            score: player.score
+        }));
+
+        // Sortera efter poäng (högst till lägst)
+        playersWithIndex.sort((a, b) => b.score - a.score);
+
+        // Tilldela placering
+        playersWithIndex.forEach((item, placement) => {
+            const imageElement = document.getElementById(`player${item.index + 1}-image`);
+            if (!imageElement) return;
+
+            const playerName = playerNames[item.index];
+
+            if (placement === 0) {
+                // Första plats: glad
+                imageElement.src = `images/${playerName}_glad.png`;
+            } else if (placement === 1) {
+                // Andra plats: neutral
+                imageElement.src = `images/${playerName}.png`;
+            } else {
+                // Tredje och fjärde plats: ledsna
                 imageElement.src = `images/${playerName}_ledsen.png`;
             }
         });
