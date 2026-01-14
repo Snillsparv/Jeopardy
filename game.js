@@ -3,10 +3,10 @@ class JeopardyGame {
     constructor() {
         this.currentRound = 1;
         this.players = [
-            { name: 'Spelare 1', score: 0, buzzerKey: '1', person: 'david' },
-            { name: 'Spelare 2', score: 0, buzzerKey: '2', person: 'hanna' },
-            { name: 'Spelare 3', score: 0, buzzerKey: '3', person: 'lina' },
-            { name: 'Spelare 4', score: 0, buzzerKey: '4', person: 'ludde' }
+            { name: 'David', score: 0, buzzerKey: '1', person: 'david' },
+            { name: 'Hanna', score: 0, buzzerKey: '2', person: 'hanna' },
+            { name: 'Lina', score: 0, buzzerKey: '3', person: 'lina' },
+            { name: 'Ludde', score: 0, buzzerKey: '4', person: 'ludde' }
         ];
         this.answeredQuestions = {
             round1: [],
@@ -38,9 +38,24 @@ class JeopardyGame {
     }
 
     init() {
-        this.renderBoard();
         this.setupEventListeners();
         this.updatePlayerScores();
+        // Visa startskärm - spelet startar inte förrän användaren klickar
+        this.showStartScreen();
+    }
+
+    showStartScreen() {
+        const startScreen = document.getElementById('startScreen');
+        startScreen.classList.remove('hidden');
+
+        document.getElementById('startGameBtn').onclick = () => {
+            startScreen.classList.add('hidden');
+            this.startGame();
+        };
+    }
+
+    startGame() {
+        this.renderBoard();
         this.playIntroMusic();
     }
 
