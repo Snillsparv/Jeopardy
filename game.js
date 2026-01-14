@@ -573,6 +573,7 @@ class JeopardyGame {
 
         document.getElementById('finalModal').classList.remove('hidden');
         document.getElementById('finalWagerSection').classList.remove('hidden');
+        document.getElementById('finalCategorySection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.add('hidden');
         document.getElementById('finalAnswerSection').classList.add('hidden');
         document.getElementById('finalRevealSection').classList.add('hidden');
@@ -588,8 +589,9 @@ class JeopardyGame {
         }
 
         if (this.finalCurrentPlayer >= 4) {
-            // Alla har satsat
-            this.showFinalQuestion();
+            // Alla har satsat - visa kategorisektionen
+            document.getElementById('finalWagerSection').classList.add('hidden');
+            document.getElementById('finalCategorySection').classList.remove('hidden');
             return;
         }
 
@@ -611,7 +613,7 @@ class JeopardyGame {
     }
 
     showFinalQuestion() {
-        document.getElementById('finalWagerSection').classList.add('hidden');
+        document.getElementById('finalCategorySection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.remove('hidden');
 
         // Spela Final Jeopardy-musik och automatiskt visa svar när den tar slut
