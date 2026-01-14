@@ -494,6 +494,94 @@ header {
     display: none !important;
 }
 
+/* Winner Modal */
+.winner-modal-content {
+    max-width: 1000px !important;
+    padding: 50px 60px !important;
+}
+
+.winner-section {
+    text-align: center;
+    margin: 30px 0;
+    padding: 30px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 15px;
+    border: 3px solid #ffd700;
+}
+
+.winner-image {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+    margin-bottom: 20px;
+}
+
+.winner-name {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.winner-score {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.losers-section {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.losers-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.loser-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    min-width: 180px;
+}
+
+.loser-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #888;
+    margin-bottom: 15px;
+}
+
+.loser-rank {
+    font-size: 1.2rem;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.loser-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.loser-score {
+    font-size: 1.3rem;
+    color: #ccc;
+}
+
 /* Final Jeopardy */
 .final-category {
     font-size: 2rem;

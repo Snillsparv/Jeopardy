@@ -1045,22 +1045,46 @@ class JeopardyGame {
         // Uppdatera ansikten baserat på placering
         this.setPlayerFacesByPlacement();
 
-        const sortedPlayers = [...this.players].sort((a, b) => b.score - a.score);
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const sortedPlayers = this.players.map((player, index) => ({
+            ...player,
+            index
+        })).sort((a, b) => b.score - a.score);
+
         const winner = sortedPlayers[0];
 
         // Spela vinnarens video
-        const winnerName = winner.name.toLowerCase();
+        const winnerName = playerNames[winner.index];
         this.playVideo(`videos/vinnarvideo_${winnerName}.mp4`, () => {
             // När videon är klar, visa vinnarmodalen
-            let winnerText = `<h3>${winner.name} vinner med ${winner.score} kr!</h3><br>`;
-            winnerText += '<h4>Slutresultat:</h4>';
-            sortedPlayers.forEach((player, index) => {
-                winnerText += `<p style="font-size: 1.3rem; margin: 10px 0;">
-                    ${index + 1}. ${player.name}: ${player.score} kr
-                </p>`;
-            });
 
-            document.getElementById('winnerText').innerHTML = winnerText;
+            // Visa vinnaren
+            document.getElementById('winnerImage').src = `images/${winnerName}_glad.png`;
+            document.getElementById('winnerName').textContent = winner.name;
+            document.getElementById('winnerScore').textContent = `${winner.score} kr`;
+
+            // Visa förlorarna
+            const losersContainer = document.getElementById('losersContainer');
+            const losers = sortedPlayers.slice(1); // Alla utom vinnaren
+
+            losersContainer.innerHTML = losers.map((player, index) => {
+                const rank = index + 2; // 2:a, 3:e, 4:e
+                const rankText = rank === 2 ? '2:a plats' : rank === 3 ? '3:e plats' : '4:e plats';
+                const imageName = playerNames[player.index];
+                const imageSrc = rank === 2
+                    ? `images/${imageName}.png`
+                    : `images/${imageName}_ledsen.png`;
+
+                return `
+                    <div class="loser-item">
+                        <div class="loser-rank">${rankText}</div>
+                        <img src="${imageSrc}" alt="${player.name}" class="loser-image">
+                        <div class="loser-name">${player.name}</div>
+                        <div class="loser-score">${player.score} kr</div>
+                    </div>
+                `;
+            }).join('');
+
             document.getElementById('winnerModal').classList.remove('hidden');
         });
     }
