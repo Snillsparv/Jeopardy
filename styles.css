@@ -512,7 +512,6 @@ header {
 .winner-image {
     width: 300px;
     height: 300px;
-    border-radius: 50%;
     object-fit: cover;
     border: 5px solid #ffd700;
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
@@ -558,7 +557,6 @@ header {
 .loser-image {
     width: 120px;
     height: 120px;
-    border-radius: 50%;
     object-fit: cover;
     border: 3px solid #888;
     margin-bottom: 15px;
