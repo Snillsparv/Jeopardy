@@ -327,37 +327,42 @@ class JeopardyGame {
     }
 
     showDailyDouble() {
-        document.getElementById('questionValue').textContent = 'DAILY DOUBLE!';
+        document.getElementById('questionValue').textContent = 'DUBBELCHANS!';
         document.getElementById('questionValue').style.color = '#ff6b6b';
         document.getElementById('questionValue').style.fontSize = '4rem';
         document.getElementById('questionCategory').textContent = this.currentQuestion.category;
 
-        // Sätt alla spelare till neutrala när Daily Double visas
-        this.setPlayerFaces(null);
+        // Sätt spelaren som äger spelet till glad
+        this.setPlayerFaces(this.currentOwner);
 
         const ownerName = this.currentOwner !== null ? this.players[this.currentOwner].name : 'Ingen';
         const ownerScore = this.currentOwner !== null ? this.players[this.currentOwner].score : 0;
         const maxValue = this.currentQuestion.data.value;
         const maxWager = Math.max(maxValue, ownerScore);
 
+        // Visa glad bild på spelaren
+        const ownerImageSrc = this.currentOwner !== null ?
+            `images/${['david', 'ludde', 'lina', 'hanna'][this.currentOwner]}_glad.png` : '';
+
         document.getElementById('questionText').innerHTML = `
             <div style="text-align: center;">
-                <p style="font-size: 1.5rem; margin-bottom: 20px;">
-                    ${ownerName} äger spelet och får svara!
-                </p>
+                <img src="${ownerImageSrc}" alt="${ownerName}"
+                    style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; margin-bottom: 20px;">
                 <p style="font-size: 1.2rem; margin-bottom: 20px;">
                     Nuvarande poäng: ${ownerScore} kr<br>
-                    Max insats: ${maxWager} kr
+                    Maxinsats: ${maxWager} kr
                 </p>
-                <label style="font-size: 1.2rem; display: block; margin-bottom: 10px;">
+                <label style="font-size: 1.5rem; display: block; margin-bottom: 15px;">
                     Välj insats:
                 </label>
                 <input type="number" id="dailyDoubleWager"
                     min="0" max="${maxWager}" value="${Math.min(1000, maxWager)}"
                     step="100"
-                    style="font-size: 1.5rem; padding: 10px; width: 200px; text-align: center;">
+                    style="font-size: 2.5rem; padding: 20px; width: 350px; text-align: center; border: 3px solid #ffd700; border-radius: 10px;">
                 <br><br>
-                <button class="btn" onclick="game.showDailyDoubleQuestion(parseInt(document.getElementById('dailyDoubleWager').value) || 0)">Fortsätt</button>
+                <p style="font-size: 1rem; color: #aaa; margin-top: 10px;">
+                    Tryck högerpil (→) för att fortsätta
+                </p>
             </div>
         `;
 
@@ -371,7 +376,7 @@ class JeopardyGame {
 
         document.getElementById('questionValue').style.color = '#ffd700';
         document.getElementById('questionValue').style.fontSize = '3rem';
-        document.getElementById('questionValue').textContent = `DAILY DOUBLE: ${wager} kr`;
+        document.getElementById('questionValue').textContent = `DUBBELCHANS: ${wager} kr`;
 
         document.getElementById('questionText').textContent = this.currentQuestion.data.question;
         document.getElementById('questionAnswer').classList.add('hidden');
@@ -379,8 +384,8 @@ class JeopardyGame {
         document.getElementById('buzzerStatus').textContent =
             `${this.players[this.currentOwner].name} svarar...`;
 
-        // Starta 7-sekunders timer för svar
-        this.startAnswerTimer();
+        // Starta 10-sekunders timer för Daily Double
+        this.startAnswerTimer(10);
     }
 
     showQuestion() {
@@ -424,11 +429,11 @@ class JeopardyGame {
         }, 1000);
     }
 
-    startAnswerTimer() {
+    startAnswerTimer(seconds = 7) {
         this.clearTimers();
-        this.timeRemaining = 7;
-        this.totalTime = 7;
-        this.createTimerBars(7);
+        this.timeRemaining = seconds;
+        this.totalTime = seconds;
+        this.createTimerBars(seconds);
         this.updateTimerDisplay();
         document.getElementById('timerDisplay').classList.remove('hidden');
 
@@ -440,6 +445,9 @@ class JeopardyGame {
                 this.clearTimers();
                 // Time's up - behandla som fel svar
                 if (!this.answerShown && this.buzzerWinner !== null) {
+                    this.answerWrong();
+                } else if (!this.answerShown && this.currentQuestion.isDailyDouble) {
+                    // Daily Double timeout
                     this.answerWrong();
                 }
             }
@@ -963,17 +971,28 @@ class JeopardyGame {
                 }
             }
 
-            // Vanlig frågemodal
+            // Daily Double wager-input
+            const dailyDoubleWagerInput = document.getElementById('dailyDoubleWager');
+            if (dailyDoubleWagerInput && !modal.classList.contains('hidden')) {
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    const wager = parseInt(dailyDoubleWagerInput.value) || 0;
+                    this.showDailyDoubleQuestion(wager);
+                    return;
+                }
+            }
+
+            // Vanlig frågemodal eller Daily Double-fråga
             if (!modal.classList.contains('hidden')) {
-                // Högerpil - rätt svar (endast om någon har buzzat)
-                if (e.key === 'ArrowRight' && this.buzzerWinner !== null) {
+                // Högerpil - rätt svar (om någon har buzzat ELLER om det är Daily Double)
+                if (e.key === 'ArrowRight' && (this.buzzerWinner !== null || this.currentQuestion.isDailyDouble)) {
                     e.preventDefault();
                     this.answerCorrect();
                     return;
                 }
 
-                // Vänsterpil - fel svar (endast om någon har buzzat)
-                if (e.key === 'ArrowLeft' && this.buzzerWinner !== null) {
+                // Vänsterpil - fel svar (om någon har buzzat ELLER om det är Daily Double)
+                if (e.key === 'ArrowLeft' && (this.buzzerWinner !== null || this.currentQuestion.isDailyDouble)) {
                     e.preventDefault();
                     this.answerWrong();
                     return;
