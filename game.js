@@ -29,6 +29,11 @@ class JeopardyGame {
         this.finalWagers = [0, 0, 0, 0];
         this.finalCurrentPlayer = 0;
 
+        // Audio state
+        this.dailyDoubleCount = 0; // Räknar antal Daily Doubles
+        this.currentAudio = null; // Håller koll på pågående ljud
+        this.finalMusicAudio = null; // Specifikt för Final Jeopardy-musik
+
         this.init();
     }
 
@@ -40,11 +45,24 @@ class JeopardyGame {
     }
 
     playIntroMusic() {
-        const audio = new Audio('jeopardy-intro.mp3');
-        audio.volume = 0.5;
+        this.playSound('Ljud/jingel.mp3', 0.5);
+    }
+
+    playSound(path, volume = 0.5) {
+        const audio = new Audio(path);
+        audio.volume = volume;
         audio.play().catch(() => {
-            console.log('Intro-musik inte tillgänglig');
+            console.log(`Ljudfil ${path} inte tillgänglig`);
         });
+        return audio;
+    }
+
+    stopCurrentAudio() {
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
+        }
     }
 
     renderBoard() {
@@ -128,6 +146,17 @@ class JeopardyGame {
     }
 
     showDailyDouble() {
+        // Spela Daily Double-ljud
+        this.dailyDoubleCount++;
+        let soundFile;
+        if (this.dailyDoubleCount === 1) {
+            soundFile = 'Ljud/dubbelchans_1.mp3';
+        } else {
+            const randomNum = Math.floor(Math.random() * 3) + 1;
+            soundFile = `Ljud/dubbelchans_${randomNum}.mp3`;
+        }
+        this.playSound(soundFile, 0.7);
+
         const modal = document.getElementById('questionModal');
         document.getElementById('questionValue').textContent = 'DAILY DOUBLE!';
         document.getElementById('questionValue').style.color = '#ff6b6b';
@@ -199,6 +228,14 @@ class JeopardyGame {
     }
 
     showQuestion() {
+        // Kolla om det är sista frågan i rundan
+        const roundKey = `round${this.currentRound}`;
+        const isLastQuestion = this.answeredQuestions[roundKey].length === 29;
+
+        if (isLastQuestion) {
+            this.playSound('Ljud/sista_frågan.mp3', 0.7);
+        }
+
         document.getElementById('questionValue').style.color = '#ffd700';
         document.getElementById('questionValue').style.fontSize = '3rem';
         document.getElementById('questionValue').textContent = this.currentQuestion.data.value + ' kr';
@@ -234,6 +271,10 @@ class JeopardyGame {
 
             if (this.timeRemaining <= 0) {
                 this.clearTimers();
+                // Spela inget_svar-ljud när tiden går ut utan buzzer
+                if (this.buzzerWinner === null) {
+                    this.playSound('Ljud/inget_svar.mp3', 0.6);
+                }
                 // Automatiskt visa svar efter 10 sekunder
                 if (!this.answerShown) {
                     this.showAnswer();
@@ -254,6 +295,8 @@ class JeopardyGame {
 
             if (this.timeRemaining <= 0) {
                 this.clearTimers();
+                // Spela inget_svar-ljud när tiden går ut
+                this.playSound('Ljud/inget_svar.mp3', 0.6);
                 // Time's up - behandla som fel svar
                 if (!this.answerShown && this.buzzerWinner !== null) {
                     this.answerWrong();
@@ -323,6 +366,9 @@ class JeopardyGame {
         if (this.buzzerWinner === null) {
             this.buzzerWinner = playerIndex;
             this.buzzerActive = false;
+
+            // Spela buzzer-ljud
+            this.playSound('Ljud/buzzer.mp3', 0.6);
 
             // Stoppa frågetimer och starta svartimer
             this.clearTimers();
@@ -430,6 +476,9 @@ class JeopardyGame {
         const totalQuestions = 30;
 
         if (this.answeredQuestions[roundKey].length === totalQuestions) {
+            // Spela slut_på_runda-ljud
+            this.playSound('Ljud/slut_på_runda.mp3', 0.7);
+
             if (this.currentRound < 3) {
                 // Automatisk övergång till nästa omgång
                 this.showRoundTransition();
@@ -462,6 +511,10 @@ class JeopardyGame {
         const roundNames = ['', 'Jeopardy', 'Double Jeopardy', 'Triple Jeopardy'];
         document.getElementById('roundIndicator').textContent =
             `Omgång ${this.currentRound}: ${roundNames[this.currentRound]}`;
+
+        // Spela jingel när ny runda börjar
+        this.playSound('Ljud/jingel.mp3', 0.5);
+
         this.renderBoard();
     }
 
@@ -475,6 +528,26 @@ class JeopardyGame {
             return;
         }
 
+        // Visa priserna-videon först
+        this.showPrizeVideo();
+    }
+
+    showPrizeVideo() {
+        const videoModal = document.getElementById('videoModal');
+        const video = document.getElementById('prizeVideo');
+
+        videoModal.classList.remove('hidden');
+        video.currentTime = 0;
+        video.play();
+
+        // När videon är klar, fortsätt till Final Jeopardy
+        video.addEventListener('ended', () => {
+            videoModal.classList.add('hidden');
+            this.showFinalJeopardyWagers();
+        }, { once: true });
+    }
+
+    showFinalJeopardyWagers() {
         this.finalCurrentPlayer = 0;
         this.finalWagers = [null, null, null, null];
 
@@ -524,9 +597,24 @@ class JeopardyGame {
     showFinalQuestion() {
         document.getElementById('finalWagerSection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.remove('hidden');
+
+        // Spela Final Jeopardy-musik och automatiskt visa svar när den tar slut
+        this.finalMusicAudio = this.playSound('Ljud/musik_finalsvar.mp3', 0.5);
+        this.finalMusicAudio.addEventListener('ended', () => {
+            if (!document.getElementById('finalAnswerSection').classList.contains('hidden')) {
+                return; // Svaret har redan visats
+            }
+            this.showFinalAnswer();
+        });
     }
 
     showFinalAnswer() {
+        // Stoppa Final Jeopardy-musik om den fortfarande spelas
+        if (this.finalMusicAudio) {
+            this.finalMusicAudio.pause();
+            this.finalMusicAudio = null;
+        }
+
         document.getElementById('finalAnswerSection').classList.remove('hidden');
         document.getElementById('finalRevealSection').classList.remove('hidden');
 
