@@ -43,15 +43,36 @@ class JeopardyGame {
     }
 
     init() {
-        this.renderBoard();
+        // Sätt upp event listeners men starta inte spelet än
         this.setupEventListeners();
         this.updatePlayerScores();
-        this.playIntroMusic();
 
-        // Starta beloppsanimation efter kort delay
-        setTimeout(() => {
-            this.revealValuesInWave();
-        }, 500);
+        // Lägg till event listener för startknappen
+        const startBtn = document.getElementById('startGameBtn');
+        if (startBtn) {
+            startBtn.onclick = () => this.startGame();
+        }
+    }
+
+    startGame() {
+        // Spela jingel
+        const jingle = this.playSound('sounds/jingel.mp3', 0.7);
+
+        // När jingeln är klar, starta spelet
+        jingle.onended = () => {
+            // Dölj startskärmen
+            document.getElementById('startScreen').style.display = 'none';
+            // Visa spelet
+            document.getElementById('gameContainer').style.display = 'block';
+
+            // Rendera brädet och starta animationer
+            this.renderBoard();
+
+            // Starta beloppsanimation efter kort delay
+            setTimeout(() => {
+                this.revealValuesInWave();
+            }, 500);
+        };
     }
 
     playIntroMusic() {
