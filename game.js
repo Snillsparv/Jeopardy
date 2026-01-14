@@ -717,17 +717,31 @@ class JeopardyGame {
         this.finalCurrentPlayer = 0;
         this.finalWagers = [null, null, null, null];
 
+        // Spara kategori och fråga
         document.getElementById('finalCategory').textContent = gameData.final.category;
+        document.getElementById('finalCategorySmall').textContent = gameData.final.category;
         document.getElementById('finalQuestionText').textContent = gameData.final.question;
         document.getElementById('finalAnswerText').textContent = gameData.final.answer;
 
+        // Visa FINAL! screen först
         document.getElementById('finalModal').classList.remove('hidden');
-        document.getElementById('finalWagerSection').classList.remove('hidden');
+        document.getElementById('finalIntroSection').classList.remove('hidden');
+        document.getElementById('finalCategoryRevealSection').classList.add('hidden');
+        document.getElementById('finalWagerSection').classList.add('hidden');
         document.getElementById('finalCategorySection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.add('hidden');
         document.getElementById('finalAnswerSection').classList.add('hidden');
         document.getElementById('finalRevealSection').classList.add('hidden');
+    }
 
+    showFinalCategoryReveal() {
+        document.getElementById('finalIntroSection').classList.add('hidden');
+        document.getElementById('finalCategoryRevealSection').classList.remove('hidden');
+    }
+
+    startFinalWagers() {
+        document.getElementById('finalCategoryRevealSection').classList.add('hidden');
+        document.getElementById('finalWagerSection').classList.remove('hidden');
         this.showNextWager();
     }
 
@@ -746,12 +760,15 @@ class JeopardyGame {
 
         const player = this.players[this.finalCurrentPlayer];
         const maxWager = player.score;
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
 
+        // Visa spelarens glada bild
+        document.getElementById('finalPlayerImage').src = `images/${playerNames[this.finalCurrentPlayer]}_glad.png`;
         document.getElementById('finalCurrentPlayer').textContent = player.name;
         document.getElementById('finalPlayerScore').textContent = `Poäng: ${player.score} kr`;
         document.getElementById('finalWagerInput').value = 0;
         document.getElementById('finalWagerInput').max = maxWager;
-        document.getElementById('finalMaxWager').textContent = `Max: ${maxWager} kr`;
+        document.getElementById('finalMaxWager').textContent = `Maxinsats: ${maxWager} kr`;
     }
 
     confirmWager() {
@@ -971,6 +988,28 @@ class JeopardyGame {
 
             // PILTANGENTER - Prioriterad hantering
 
+            // Final Jeopardy Intro - visa kategori
+            const finalIntroSection = document.getElementById('finalIntroSection');
+            if (!finalIntroSection.classList.contains('hidden') &&
+                !finalModal.classList.contains('hidden')) {
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    this.showFinalCategoryReveal();
+                    return;
+                }
+            }
+
+            // Final Jeopardy Category Reveal - börja satsa
+            const finalCategoryRevealSection = document.getElementById('finalCategoryRevealSection');
+            if (!finalCategoryRevealSection.classList.contains('hidden') &&
+                !finalModal.classList.contains('hidden')) {
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    this.startFinalWagers();
+                    return;
+                }
+            }
+
             // Final Jeopardy Reveal - högsta prioritet
             if (!finalRevealSection.classList.contains('hidden') &&
                 !finalModal.classList.contains('hidden')) {
@@ -1003,7 +1042,7 @@ class JeopardyGame {
                     e.preventDefault();
                     input.value = Math.max(0, parseInt(input.value || 0) - 100);
                     return;
-                } else if (e.key === 'Enter') {
+                } else if (e.key === 'Enter' || e.key === 'ArrowRight') {
                     e.preventDefault();
                     this.confirmWager();
                     return;

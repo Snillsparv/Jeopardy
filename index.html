@@ -77,20 +77,38 @@
         <!-- Final Jeopardy Modal -->
         <div id="finalModal" class="modal hidden">
             <div class="modal-content final-modal">
-                <h2>FINAL JEOPARDY!</h2>
-                <div class="final-category" id="finalCategory"></div>
+                <!-- Initial FINAL! screen -->
+                <div id="finalIntroSection" class="final-section">
+                    <h2 style="font-size: 5rem; color: #ff6b6b; margin: 50px 0;">FINAL!</h2>
+                    <p style="font-size: 1.2rem; color: #aaa; margin-top: 30px;">
+                        Tryck högerpil (→) för att avslöja kategori
+                    </p>
+                </div>
+
+                <!-- Kategori-avslöjning -->
+                <div id="finalCategoryRevealSection" class="final-section hidden">
+                    <h2>FINAL JEOPARDY!</h2>
+                    <div class="final-category" id="finalCategory" style="font-size: 2rem; margin: 40px 0;"></div>
+                    <p style="font-size: 1.2rem; color: #aaa; margin-top: 30px;">
+                        Tryck högerpil (→) för att börja satsa
+                    </p>
+                </div>
 
                 <!-- Insatser en spelare i taget -->
                 <div id="finalWagerSection" class="final-section hidden">
-                    <h3 id="finalCurrentPlayer">Spelare X</h3>
-                    <p id="finalPlayerScore" style="font-size: 1.3rem; margin: 10px 0;">Poäng: 0 kr</p>
-                    <p id="finalMaxWager" style="font-size: 1.1rem; color: #ffd700; margin: 10px 0;">Max: 0 kr</p>
-                    <div class="wager-input-single">
-                        <label style="font-size: 1.2rem;">Välj insats (↑↓ för ±100 kr):</label>
-                        <input type="number" id="finalWagerInput" min="0" step="100"
-                            style="font-size: 1.5rem; padding: 10px; width: 200px; text-align: center; margin: 10px 0;">
-                    </div>
-                    <button id="confirmWagerBtn" class="btn">OK (Enter)</button>
+                    <h2>FINAL JEOPARDY!</h2>
+                    <div class="final-category" id="finalCategorySmall" style="font-size: 1.3rem; margin-bottom: 20px;"></div>
+                    <img id="finalPlayerImage" src="" alt="Spelare"
+                        style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; margin-bottom: 20px;">
+                    <h3 id="finalCurrentPlayer" style="font-size: 1.8rem; margin-bottom: 15px;">Spelare X</h3>
+                    <p id="finalPlayerScore" style="font-size: 1.2rem; margin: 10px 0;">Poäng: 0 kr</p>
+                    <p id="finalMaxWager" style="font-size: 1.2rem; color: #ffd700; margin: 10px 0;">Maxinsats: 0 kr</p>
+                    <label style="font-size: 1.5rem; display: block; margin: 20px 0;">Välj insats:</label>
+                    <input type="number" id="finalWagerInput" min="0" step="100"
+                        style="font-size: 2.5rem; padding: 20px; width: 350px; text-align: center; border: 3px solid #ffd700; border-radius: 10px; margin: 10px 0;">
+                    <p style="font-size: 1rem; color: #aaa; margin-top: 15px;">
+                        Tryck Enter eller högerpil (→) för att bekräfta
+                    </p>
                 </div>
 
                 <!-- Kategori-visa (efter alla satsat) -->
