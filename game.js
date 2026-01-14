@@ -781,10 +781,8 @@ class JeopardyGame {
                 // Automatisk övergång till nästa omgång
                 this.showRoundTransition();
             } else {
-                // Gå till Final Jeopardy - visa priserna först
-                this.playVideo('sounds/priserna.mp4', () => {
-                    this.startFinalJeopardy();
-                });
+                // Gå till Final Jeopardy - visa ställningen först
+                this.showStandings();
             }
         }
     }
@@ -831,6 +829,55 @@ class JeopardyGame {
         setTimeout(() => {
             this.revealValuesInWave();
         }, 500);
+    }
+
+    showStandings() {
+        // Uppdatera ansikten baserat på placering
+        this.setPlayerFacesByPlacement();
+
+        // Sortera spelare efter poäng (högst till lägst)
+        const sortedPlayers = this.players.map((player, index) => ({
+            ...player,
+            index
+        })).sort((a, b) => b.score - a.score);
+
+        // Bygg upp HTML för spelarna
+        const standingsContainer = document.getElementById('standingsPlayers');
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+
+        standingsContainer.innerHTML = sortedPlayers.map((player, rank) => {
+            const rankText = ['1:a plats', '2:a plats', '3:e plats', '4:e plats'][rank];
+            const imageName = playerNames[player.index];
+            const imageSrc = rank === 0
+                ? `images/${imageName}_glad.png`
+                : rank === 1
+                    ? `images/${imageName}.png`
+                    : `images/${imageName}_ledsen.png`;
+
+            return `
+                <div class="standings-player">
+                    <img src="${imageSrc}" alt="${player.name}" class="standings-player-image">
+                    <div class="standings-player-info">
+                        <div class="standings-player-name">${player.name}</div>
+                        <div class="standings-player-score">${player.score} kr</div>
+                        <div class="standings-player-rank">${rankText}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Visa ställningsmodal
+        document.getElementById('standingsModal').classList.remove('hidden');
+    }
+
+    proceedToPriserna() {
+        // Dölj ställningsmodal
+        document.getElementById('standingsModal').classList.add('hidden');
+
+        // Visa priserna-video och sedan starta Final Jeopardy
+        this.playVideo('sounds/priserna.mp4', () => {
+            this.startFinalJeopardy();
+        });
     }
 
     startFinalJeopardy() {
@@ -1107,8 +1154,16 @@ class JeopardyGame {
         document.addEventListener('keydown', (e) => {
             const modal = document.getElementById('questionModal');
             const finalModal = document.getElementById('finalModal');
+            const standingsModal = document.getElementById('standingsModal');
             const finalRevealSection = document.getElementById('finalRevealSection');
             const finalWagerSection = document.getElementById('finalWagerSection');
+
+            // Standings modal - fortsätt till priserna
+            if (!standingsModal.classList.contains('hidden') && e.key === 'PageDown') {
+                e.preventDefault();
+                this.proceedToPriserna();
+                return;
+            }
 
             // Högerpil för kategoriavslöjning (när ingen modal är öppen och belopp är avslöjade)
             if (e.key === 'PageDown' &&

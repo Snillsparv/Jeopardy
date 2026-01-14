@@ -397,6 +397,66 @@ header {
     50% { transform: scale(1.05); }
 }
 
+/* Standings */
+.standings-content {
+    padding: 50px 60px !important;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    max-width: 1200px !important;
+}
+
+.standings-players {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.standings-player {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 25px;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+
+.standings-player:hover {
+    transform: scale(1.05);
+}
+
+.standings-player-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ffd700;
+}
+
+.standings-player-info {
+    flex: 1;
+    text-align: left;
+}
+
+.standings-player-name {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+.standings-player-score {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.standings-player-rank {
+    font-size: 1.2rem;
+    color: #aaa;
+    margin-top: 5px;
+}
+
 /* Buttons */
 .modal-buttons {
     display: flex;
