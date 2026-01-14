@@ -3,10 +3,10 @@ class JeopardyGame {
     constructor() {
         this.currentRound = 1;
         this.players = [
-            { name: 'Spelare 1', score: 0, buzzerKey: '1' },
-            { name: 'Spelare 2', score: 0, buzzerKey: '2' },
-            { name: 'Spelare 3', score: 0, buzzerKey: '3' },
-            { name: 'Spelare 4', score: 0, buzzerKey: '4' }
+            { name: 'Spelare 1', score: 0, buzzerKey: '1', person: 'david' },
+            { name: 'Spelare 2', score: 0, buzzerKey: '2', person: 'hanna' },
+            { name: 'Spelare 3', score: 0, buzzerKey: '3', person: 'lina' },
+            { name: 'Spelare 4', score: 0, buzzerKey: '4', person: 'ludde' }
         ];
         this.answeredQuestions = {
             round1: [],
@@ -495,15 +495,31 @@ class JeopardyGame {
         const nextRound = this.currentRound + 1;
         const roundNames = ['', 'Jeopardy', 'Double Jeopardy', 'Triple Jeopardy'];
 
-        const modal = document.getElementById('transitionModal');
-        document.getElementById('transitionText').textContent =
-            `Nästa omgång: ${roundNames[nextRound]}!`;
-        modal.classList.remove('hidden');
+        // Visa transition-video
+        const videoModal = document.getElementById('videoModal');
+        const video = document.getElementById('prizeVideo');
 
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            this.startNextRound();
-        }, 2000);
+        // Uppdatera videon till transition
+        video.querySelector('source').src = 'Ljud/transition.mp4';
+        video.load();
+
+        videoModal.classList.remove('hidden');
+        video.play();
+
+        // När videon är klar, visa text och fortsätt
+        video.addEventListener('ended', () => {
+            videoModal.classList.add('hidden');
+
+            const modal = document.getElementById('transitionModal');
+            document.getElementById('transitionText').textContent =
+                `Nästa omgång: ${roundNames[nextRound]}!`;
+            modal.classList.remove('hidden');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                this.startNextRound();
+            }, 2000);
+        }, { once: true });
     }
 
     startNextRound() {
@@ -683,6 +699,35 @@ class JeopardyGame {
         const sortedPlayers = [...this.players].sort((a, b) => b.score - a.score);
         const winner = sortedPlayers[0];
 
+        // Visa vinnarens video först
+        this.showWinnerVideo(winner, sortedPlayers);
+    }
+
+    showWinnerVideo(winner, sortedPlayers) {
+        const videoModal = document.getElementById('videoModal');
+        const video = document.getElementById('prizeVideo');
+
+        // Sätt rätt vinnarvideo baserat på person
+        const winnerVideoPath = `Ljud/${winner.person}.mp4`;
+        video.querySelector('source').src = winnerVideoPath;
+        video.load();
+
+        videoModal.classList.remove('hidden');
+        video.play().catch(() => {
+            // Om videon inte finns, visa vinnaren direkt
+            console.log(`Vinnarvideo ${winnerVideoPath} inte tillgänglig`);
+            videoModal.classList.add('hidden');
+            this.displayWinnerModal(winner, sortedPlayers);
+        });
+
+        // När videon är klar, visa slutresultatet
+        video.addEventListener('ended', () => {
+            videoModal.classList.add('hidden');
+            this.displayWinnerModal(winner, sortedPlayers);
+        }, { once: true });
+    }
+
+    displayWinnerModal(winner, sortedPlayers) {
         let winnerText = `<h3>${winner.name} vinner med ${winner.score} kr!</h3><br>`;
         winnerText += '<h4>Slutresultat:</h4>';
         sortedPlayers.forEach((player, index) => {
