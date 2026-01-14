@@ -120,8 +120,9 @@ class JeopardyGame {
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                max-width: 90%;
-                max-height: 90%;
+                width: 95vw;
+                height: 95vh;
+                object-fit: contain;
                 z-index: 10000;
                 background: black;
             `;
@@ -373,12 +374,6 @@ class JeopardyGame {
         };
 
         this.answerShown = false;
-
-        // Spela ljud för sista frågan (när 29 frågor är besvarade)
-        const roundKey = `round${this.currentRound}`;
-        if (this.answeredQuestions[roundKey].length === 29) {
-            this.playSound('sounds/sista_frågan.mp3', 0.6);
-        }
 
         // Hitta frågekortet och få dess position
         const questionCells = document.querySelectorAll('.question-cell');
@@ -871,6 +866,9 @@ class JeopardyGame {
     showFinalCategoryReveal() {
         document.getElementById('finalIntroSection').classList.add('hidden');
         document.getElementById('finalCategoryRevealSection').classList.remove('hidden');
+
+        // Spela sista_frågan.mp3 när kategorin avslöjas
+        this.playSound('sounds/sista_frågan.mp3', 0.6);
     }
 
     startFinalWagers() {
@@ -1113,7 +1111,7 @@ class JeopardyGame {
             const finalWagerSection = document.getElementById('finalWagerSection');
 
             // Högerpil för kategoriavslöjning (när ingen modal är öppen och belopp är avslöjade)
-            if (e.key === 'ArrowRight' &&
+            if (e.key === 'PageDown' &&
                 this.valuesRevealed &&
                 !this.categoriesRevealed &&
                 modal.classList.contains('hidden') &&
@@ -1139,7 +1137,7 @@ class JeopardyGame {
             const finalIntroSection = document.getElementById('finalIntroSection');
             if (!finalIntroSection.classList.contains('hidden') &&
                 !finalModal.classList.contains('hidden')) {
-                if (e.key === 'ArrowRight') {
+                if (e.key === 'PageDown') {
                     e.preventDefault();
                     this.showFinalCategoryReveal();
                     return;
@@ -1150,7 +1148,7 @@ class JeopardyGame {
             const finalCategoryRevealSection = document.getElementById('finalCategoryRevealSection');
             if (!finalCategoryRevealSection.classList.contains('hidden') &&
                 !finalModal.classList.contains('hidden')) {
-                if (e.key === 'ArrowRight') {
+                if (e.key === 'PageDown') {
                     e.preventDefault();
                     this.startFinalWagers();
                     return;
@@ -1189,7 +1187,7 @@ class JeopardyGame {
                     e.preventDefault();
                     input.value = Math.max(0, parseInt(input.value || 0) - 100);
                     return;
-                } else if (e.key === 'Enter' || e.key === 'ArrowRight') {
+                } else if (e.key === 'Enter' || e.key === 'PageDown') {
                     e.preventDefault();
                     this.confirmWager();
                     return;
@@ -1199,7 +1197,7 @@ class JeopardyGame {
             // Daily Double wager-input
             const dailyDoubleWagerInput = document.getElementById('dailyDoubleWager');
             if (dailyDoubleWagerInput && !modal.classList.contains('hidden')) {
-                if (e.key === 'ArrowRight') {
+                if (e.key === 'PageDown') {
                     e.preventDefault();
                     const wager = parseInt(dailyDoubleWagerInput.value) || 0;
                     this.showDailyDoubleQuestion(wager);
@@ -1210,14 +1208,14 @@ class JeopardyGame {
             // Vanlig frågemodal eller Daily Double-fråga
             if (!modal.classList.contains('hidden')) {
                 // Högerpil - rätt svar (om någon har buzzat ELLER om det är Daily Double)
-                if (e.key === 'ArrowRight' && (this.buzzerWinner !== null || this.currentQuestion.isDailyDouble)) {
+                if (e.key === 'PageDown' && (this.buzzerWinner !== null || this.currentQuestion.isDailyDouble)) {
                     e.preventDefault();
                     this.answerCorrect();
                     return;
                 }
 
                 // Vänsterpil - fel svar (om någon har buzzat ELLER om det är Daily Double)
-                if (e.key === 'ArrowLeft' && (this.buzzerWinner !== null || this.currentQuestion.isDailyDouble)) {
+                if (e.key === 'PageUp' && (this.buzzerWinner !== null || this.currentQuestion.isDailyDouble)) {
                     e.preventDefault();
                     this.answerWrong();
                     return;
