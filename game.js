@@ -229,6 +229,9 @@ class JeopardyGame {
             return;
         }
 
+        // Spela ljud när beloppen snurrar upp
+        this.playSound('sounds/jingel.mp3', 0.6);
+
         const currentData = this.getCurrentRoundData();
 
         if (!currentData) {
