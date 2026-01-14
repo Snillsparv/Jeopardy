@@ -34,6 +34,11 @@ class JeopardyGame {
         this.categoriesRevealed = false; // Om alla ämnen är avslöjade
         this.valuesRevealed = false; // Om beloppen är avslöjade
 
+        // Ljud och video
+        this.dailyDoubleCount = 0; // Räkna antal Daily Doubles
+        this.currentAudio = null; // För att kunna stoppa ljud
+        this.currentVideo = null; // För att kunna stoppa video
+
         this.init();
     }
 
@@ -55,6 +60,78 @@ class JeopardyGame {
         audio.play().catch(() => {
             console.log('Intro-musik inte tillgänglig');
         });
+    }
+
+    // Ljudhantering
+    playSound(soundFile, volume = 0.7) {
+        // Stoppa tidigare ljud om det finns
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+        }
+
+        this.currentAudio = new Audio(soundFile);
+        this.currentAudio.volume = volume;
+        this.currentAudio.play().catch((error) => {
+            console.log(`Kunde inte spela ${soundFile}:`, error);
+        });
+
+        return this.currentAudio;
+    }
+
+    stopSound() {
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
+        }
+    }
+
+    // Videohantering
+    playVideo(videoFile, onEnded = null) {
+        // Skapa video-element om det inte finns
+        let videoElement = document.getElementById('gameVideo');
+        if (!videoElement) {
+            videoElement = document.createElement('video');
+            videoElement.id = 'gameVideo';
+            videoElement.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                max-width: 90%;
+                max-height: 90%;
+                z-index: 10000;
+                background: black;
+            `;
+            document.body.appendChild(videoElement);
+        }
+
+        videoElement.src = videoFile;
+        videoElement.style.display = 'block';
+        videoElement.play();
+
+        if (onEnded) {
+            videoElement.onended = () => {
+                videoElement.style.display = 'none';
+                onEnded();
+            };
+        } else {
+            videoElement.onended = () => {
+                videoElement.style.display = 'none';
+            };
+        }
+
+        this.currentVideo = videoElement;
+        return videoElement;
+    }
+
+    stopVideo() {
+        const videoElement = document.getElementById('gameVideo');
+        if (videoElement) {
+            videoElement.pause();
+            videoElement.style.display = 'none';
+        }
     }
 
     renderBoard() {
@@ -273,6 +350,12 @@ class JeopardyGame {
 
         this.answerShown = false;
 
+        // Spela ljud för sista frågan (när 29 frågor är besvarade)
+        const roundKey = `round${this.currentRound}`;
+        if (this.answeredQuestions[roundKey].length === 29) {
+            this.playSound('sounds/sista_frågan.mp3', 0.6);
+        }
+
         // Hitta frågekortet och få dess position
         const questionCells = document.querySelectorAll('.question-cell');
         const questionIndex = row * 6 + col;
@@ -331,6 +414,17 @@ class JeopardyGame {
         document.getElementById('questionValue').style.color = '#ff6b6b';
         document.getElementById('questionValue').style.fontSize = '4rem';
         document.getElementById('questionCategory').textContent = this.currentQuestion.category;
+
+        // Spela Daily Double-ljud
+        this.dailyDoubleCount++;
+        if (this.dailyDoubleCount === 1) {
+            // Första gången - spela dubbelchans_1
+            this.playSound('sounds/dubbelchans_1.mp3');
+        } else {
+            // Slumpa mellan 1, 2 och 3
+            const randomSound = Math.floor(Math.random() * 3) + 1;
+            this.playSound(`sounds/dubbelchans_${randomSound}.mp3`);
+        }
 
         // Sätt spelaren som äger spelet till glad
         this.setPlayerFaces(this.currentOwner);
@@ -420,7 +514,10 @@ class JeopardyGame {
                 this.clearTimers();
                 // Automatiskt stäng frågan efter 10 sekunder
                 if (!this.answerShown) {
-                    // Ingen lyckas svara - alla blir neutrala
+                    // Ingen lyckas svara - spela inget_svar ljud
+                    this.playSound('sounds/inget_svar.mp3', 0.5);
+
+                    // Alla blir neutrala
                     this.setPlayerFaces(null);
                     this.markQuestionAsAnswered();
                     this.closeQuestionModal();
@@ -537,6 +634,9 @@ class JeopardyGame {
             this.buzzerWinner = playerIndex;
             this.buzzerActive = false;
 
+            // Spela buzzer-ljud
+            this.playSound('sounds/buzzer.mp3', 0.6);
+
             // Stoppa frågetimer och starta svartimer
             this.clearTimers();
             this.startAnswerTimer();
@@ -611,7 +711,10 @@ class JeopardyGame {
                 // Starta ny timer
                 this.startQuestionTimer();
             } else {
-                // Alla har försökt och ingen lyckas - alla blir neutrala
+                // Alla har försökt och ingen lyckas - spela inget_svar ljud
+                this.playSound('sounds/inget_svar.mp3', 0.5);
+
+                // Alla blir neutrala
                 this.setPlayerFaces(null);
 
                 this.markQuestionAsAnswered();
@@ -659,10 +762,10 @@ class JeopardyGame {
                 // Automatisk övergång till nästa omgång
                 this.showRoundTransition();
             } else {
-                // Gå till Final Jeopardy
-                setTimeout(() => {
+                // Gå till Final Jeopardy - visa priserna först
+                this.playVideo('sounds/priserna.mp4', () => {
                     this.startFinalJeopardy();
-                }, 1000);
+                });
             }
         }
     }
@@ -674,15 +777,22 @@ class JeopardyGame {
         // Uppdatera ansikten baserat på placering
         this.setPlayerFacesByPlacement();
 
-        const modal = document.getElementById('transitionModal');
-        document.getElementById('transitionText').textContent =
-            `Nästa omgång: ${roundNames[nextRound]}!`;
-        modal.classList.remove('hidden');
+        // Spela slut på runda-ljud
+        this.playSound('sounds/slut_på_runda.mp3', 0.7);
 
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            this.startNextRound();
-        }, 2000);
+        // Spela transition-video
+        this.playVideo('sounds/transition.mp4', () => {
+            // När videon är klar, visa textmodalen
+            const modal = document.getElementById('transitionModal');
+            document.getElementById('transitionText').textContent =
+                `Nästa omgång: ${roundNames[nextRound]}!`;
+            modal.classList.remove('hidden');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                this.startNextRound();
+            }, 2000);
+        });
     }
 
     startNextRound() {
@@ -787,6 +897,14 @@ class JeopardyGame {
     showActualFinalQuestion() {
         document.getElementById('finalCategorySection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.remove('hidden');
+
+        // Spela Final Jeopardy-musik
+        const finalMusic = this.playSound('sounds/musik_finalsvar.mp3', 0.7);
+
+        // När musiken är klar, visa automatiskt svaret
+        finalMusic.onended = () => {
+            this.showFinalAnswer();
+        };
     }
 
     showFinalAnswer() {
@@ -861,16 +979,21 @@ class JeopardyGame {
         const sortedPlayers = [...this.players].sort((a, b) => b.score - a.score);
         const winner = sortedPlayers[0];
 
-        let winnerText = `<h3>${winner.name} vinner med ${winner.score} kr!</h3><br>`;
-        winnerText += '<h4>Slutresultat:</h4>';
-        sortedPlayers.forEach((player, index) => {
-            winnerText += `<p style="font-size: 1.3rem; margin: 10px 0;">
-                ${index + 1}. ${player.name}: ${player.score} kr
-            </p>`;
-        });
+        // Spela vinnarens video
+        const winnerName = winner.name.toLowerCase();
+        this.playVideo(`videos/vinnarvideo_${winnerName}.mp4`, () => {
+            // När videon är klar, visa vinnarmodalen
+            let winnerText = `<h3>${winner.name} vinner med ${winner.score} kr!</h3><br>`;
+            winnerText += '<h4>Slutresultat:</h4>';
+            sortedPlayers.forEach((player, index) => {
+                winnerText += `<p style="font-size: 1.3rem; margin: 10px 0;">
+                    ${index + 1}. ${player.name}: ${player.score} kr
+                </p>`;
+            });
 
-        document.getElementById('winnerText').innerHTML = winnerText;
-        document.getElementById('winnerModal').classList.remove('hidden');
+            document.getElementById('winnerText').innerHTML = winnerText;
+            document.getElementById('winnerModal').classList.remove('hidden');
+        });
     }
 
     newGame() {
