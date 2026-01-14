@@ -3,10 +3,10 @@ class JeopardyGame {
     constructor() {
         this.currentRound = 1;
         this.players = [
-            { name: 'Spelare 1', score: 0, buzzerKey: '1' },
-            { name: 'Spelare 2', score: 0, buzzerKey: '2' },
-            { name: 'Spelare 3', score: 0, buzzerKey: '3' },
-            { name: 'Spelare 4', score: 0, buzzerKey: '4' }
+            { name: 'David', score: 0, buzzerKey: '1' },
+            { name: 'Ludde', score: 0, buzzerKey: '2' },
+            { name: 'Lina', score: 0, buzzerKey: '3' },
+            { name: 'Hanna', score: 0, buzzerKey: '4' }
         ];
         this.answeredQuestions = {
             round1: [],
@@ -364,9 +364,6 @@ class JeopardyGame {
         document.getElementById('questionAnswer').classList.add('hidden');
         document.getElementById('buzzerStatus').textContent = '';
         document.getElementById('timerDisplay').classList.add('hidden');
-
-        document.getElementById('correctBtn').classList.add('hidden');
-        document.getElementById('wrongBtn').classList.add('hidden');
     }
 
     showDailyDoubleQuestion(wager) {
@@ -379,8 +376,6 @@ class JeopardyGame {
         document.getElementById('questionText').textContent = this.currentQuestion.data.question;
         document.getElementById('questionAnswer').classList.add('hidden');
 
-        document.getElementById('correctBtn').classList.remove('hidden');
-        document.getElementById('wrongBtn').classList.remove('hidden');
         document.getElementById('buzzerStatus').textContent =
             `${this.players[this.currentOwner].name} svarar...`;
 
@@ -394,12 +389,10 @@ class JeopardyGame {
         document.getElementById('questionValue').textContent = this.currentQuestion.data.value + ' kr';
         document.getElementById('questionCategory').textContent = this.currentQuestion.category;
         document.getElementById('questionText').textContent = this.currentQuestion.data.question;
-        document.getElementById('buzzerStatus').textContent = 'Väntar på buzzer...';
+        document.getElementById('buzzerStatus').textContent = '';
 
         // Dölj allt som inte behövs
         document.getElementById('questionAnswer').classList.add('hidden');
-        document.getElementById('correctBtn').classList.add('hidden');
-        document.getElementById('wrongBtn').classList.add('hidden');
 
         // Sätt alla spelare till neutrala när ny fråga visas
         this.setPlayerFaces(null);
@@ -543,9 +536,6 @@ class JeopardyGame {
             const player = this.players[playerIndex];
             document.getElementById('buzzerStatus').textContent = `${player.name} buzzade in!`;
 
-            document.getElementById('correctBtn').classList.remove('hidden');
-            document.getElementById('wrongBtn').classList.remove('hidden');
-
             const playerElement = document.getElementById(`player${playerIndex + 1}`);
             playerElement.classList.add('buzzed', 'active');
         }
@@ -608,9 +598,7 @@ class JeopardyGame {
             if (this.buzzerAttempts.length < 4) {
                 this.buzzerWinner = null;
                 this.buzzerActive = true;
-                document.getElementById('buzzerStatus').textContent = 'Väntar på nästa buzzer...';
-                document.getElementById('correctBtn').classList.add('hidden');
-                document.getElementById('wrongBtn').classList.add('hidden');
+                document.getElementById('buzzerStatus').textContent = '';
 
                 // Starta ny timer
                 this.startQuestionTimer();
@@ -977,53 +965,21 @@ class JeopardyGame {
 
             // Vanlig frågemodal
             if (!modal.classList.contains('hidden')) {
-                // Högerpil - rätt svar om någon har buzzat, annars stäng
-                if (e.key === 'ArrowRight') {
+                // Högerpil - rätt svar (endast om någon har buzzat)
+                if (e.key === 'ArrowRight' && this.buzzerWinner !== null) {
                     e.preventDefault();
-
-                    const correctBtn = document.getElementById('correctBtn');
-                    const wrongBtn = document.getElementById('wrongBtn');
-
-                    // Om rätt/fel-knapparna är synliga (någon har buzzat), markera som rätt
-                    if (correctBtn && !correctBtn.classList.contains('hidden')) {
-                        this.answerCorrect();
-                    } else {
-                        // Annars stäng frågan
-                        this.closeQuestionModal();
-                    }
+                    this.answerCorrect();
                     return;
                 }
 
-                // Uppåt/nedåt pilar för rätt/fel
-                const correctBtn = document.getElementById('correctBtn');
-                const wrongBtn = document.getElementById('wrongBtn');
-
-                // Kolla om knapparna är synliga (inte hidden)
-                const correctVisible = !correctBtn.classList.contains('hidden');
-                const wrongVisible = !wrongBtn.classList.contains('hidden');
-
-                if (correctVisible && wrongVisible) {
-                    if (e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        this.answerCorrect();
-                        return;
-                    } else if (e.key === 'ArrowDown') {
-                        e.preventDefault();
-                        this.answerWrong();
-                        return;
-                    }
+                // Vänsterpil - fel svar (endast om någon har buzzat)
+                if (e.key === 'ArrowLeft' && this.buzzerWinner !== null) {
+                    e.preventDefault();
+                    this.answerWrong();
+                    return;
                 }
             }
         });
-
-        // Sätt event listeners - skydda mot null
-        const closeBtn = document.getElementById('closeBtn');
-        const correctBtn = document.getElementById('correctBtn');
-        const wrongBtn = document.getElementById('wrongBtn');
-
-        if (closeBtn) closeBtn.onclick = () => this.closeQuestionModal();
-        if (correctBtn) correctBtn.onclick = () => this.answerCorrect();
-        if (wrongBtn) wrongBtn.onclick = () => this.answerWrong();
 
         // Final Jeopardy buttons
         const showFinalQuestionBtn = document.getElementById('showFinalQuestionBtn');
