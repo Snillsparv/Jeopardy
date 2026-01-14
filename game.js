@@ -1155,6 +1155,28 @@ class JeopardyGame {
                 }
             }
 
+            // Final Jeopardy Category Section - visa frågan
+            const finalCategorySection = document.getElementById('finalCategorySection');
+            if (!finalCategorySection.classList.contains('hidden') &&
+                !finalModal.classList.contains('hidden')) {
+                if (e.key === 'PageDown') {
+                    e.preventDefault();
+                    this.showActualFinalQuestion();
+                    return;
+                }
+            }
+
+            // Final Jeopardy Question Section - visa svaret
+            const finalQuestionSection = document.getElementById('finalQuestionSection');
+            if (!finalQuestionSection.classList.contains('hidden') &&
+                !finalModal.classList.contains('hidden')) {
+                if (e.key === 'PageDown') {
+                    e.preventDefault();
+                    this.showFinalAnswer();
+                    return;
+                }
+            }
+
             // Final Jeopardy Reveal - högsta prioritet
             if (!finalRevealSection.classList.contains('hidden') &&
                 !finalModal.classList.contains('hidden')) {
@@ -1223,16 +1245,10 @@ class JeopardyGame {
             }
         });
 
-        // Final Jeopardy buttons
-        const showFinalQuestionBtn = document.getElementById('showFinalQuestionBtn');
-        const showFinalAnswerBtn = document.getElementById('showFinalAnswerBtn');
-        const confirmWagerBtn = document.getElementById('confirmWagerBtn');
+        // Final Jeopardy buttons (removed showFinalQuestionBtn and showFinalAnswerBtn - using Page Down instead)
         const revealCorrectBtn = document.getElementById('revealCorrectBtn');
         const revealWrongBtn = document.getElementById('revealWrongBtn');
 
-        if (showFinalQuestionBtn) showFinalQuestionBtn.onclick = () => this.showActualFinalQuestion();
-        if (showFinalAnswerBtn) showFinalAnswerBtn.onclick = () => this.showFinalAnswer();
-        if (confirmWagerBtn) confirmWagerBtn.onclick = () => this.confirmWager();
         if (revealCorrectBtn) revealCorrectBtn.onclick = () => this.finalAnswerCorrect();
         if (revealWrongBtn) revealWrongBtn.onclick = () => this.finalAnswerWrong();
 
