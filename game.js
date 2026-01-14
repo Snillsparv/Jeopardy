@@ -968,12 +968,7 @@ class JeopardyGame {
         document.getElementById('finalQuestionSection').classList.remove('hidden');
 
         // Spela Final Jeopardy-musik
-        const finalMusic = this.playSound('sounds/musik_finalsvar.mp3', 0.7);
-
-        // När musiken är klar, visa automatiskt svaret
-        finalMusic.onended = () => {
-            this.showFinalAnswer();
-        };
+        this.playSound('sounds/musik_finalsvar.mp3', 0.7);
     }
 
     showFinalAnswer() {
@@ -1264,11 +1259,11 @@ class JeopardyGame {
 
                 if (!revealCorrectBtn.classList.contains('hidden') &&
                     !revealWrongBtn.classList.contains('hidden')) {
-                    if (e.key === 'ArrowUp') {
+                    if (e.key === 'PageDown') {
                         e.preventDefault();
                         this.finalAnswerCorrect();
                         return;
-                    } else if (e.key === 'ArrowDown') {
+                    } else if (e.key === 'PageUp') {
                         e.preventDefault();
                         this.finalAnswerWrong();
                         return;
