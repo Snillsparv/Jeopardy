@@ -450,8 +450,19 @@ class JeopardyGame {
 
         const ownerName = this.currentOwner !== null ? this.players[this.currentOwner].name : 'Ingen';
         const ownerScore = this.currentOwner !== null ? this.players[this.currentOwner].score : 0;
-        const maxValue = this.currentQuestion.data.value;
-        const maxWager = Math.max(maxValue, ownerScore);
+
+        // Hitta högsta värdet på brädet för denna runda
+        const currentData = this.getCurrentRoundData();
+        let maxBoardValue = 0;
+        currentData.questions.forEach(category => {
+            category.forEach(q => {
+                if (q.value > maxBoardValue) {
+                    maxBoardValue = q.value;
+                }
+            });
+        });
+
+        const maxWager = Math.max(maxBoardValue, ownerScore);
 
         // Visa glad bild på spelaren
         const ownerImageSrc = this.currentOwner !== null ?
