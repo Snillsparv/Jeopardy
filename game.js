@@ -972,6 +972,7 @@ class JeopardyGame {
     }
 
     showFinalAnswer() {
+        document.getElementById('finalQuestionSection').classList.add('hidden');
         document.getElementById('finalAnswerSection').classList.remove('hidden');
         document.getElementById('finalRevealSection').classList.remove('hidden');
 
