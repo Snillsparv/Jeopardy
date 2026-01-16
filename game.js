@@ -19,6 +19,7 @@ class JeopardyGame {
         this.buzzerAttempts = [];
         this.autoCloseTimeout = null;
         this.answerShown = false;
+        this.showingDeathCategoryAnswer = false; // För att kunna stänga med PageDown
         this.currentOwner = null; // Vem som senast svarade rätt (äger spelet)
         this.questionTimer = null; // 10s timer för frågor
         this.answerTimer = null; // 7s timer för svar
@@ -695,7 +696,11 @@ class JeopardyGame {
             this.buzzerWinner = playerIndex;
             this.buzzerActive = false;
 
-            // Intro-ljud fortsätter spela, spela bara buzzer-ljud ovanpå
+            // Pausa intro-ljud om det spelar
+            if (this.introAudio && !this.introAudio.paused) {
+                this.introAudio.pause();
+            }
+
             // Spela buzzer-ljud
             const buzzerSound = new Audio('sounds/buzzer.mp3');
             buzzerSound.volume = 0.6;
@@ -770,7 +775,7 @@ class JeopardyGame {
         // För "Vem har dött" kategorin, visa frågan i 10 sekunder extra
         const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
         if (isDeathCategory) {
-            // Vänta 200ms för att visa glatt ansikte, sedan visa frågan
+            // Vänta 400ms för att visa glatt ansikte, sedan visa frågan
             setTimeout(() => {
                 document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
                 document.getElementById('buzzerStatus').textContent = '✓ Rätt svar!';
@@ -778,18 +783,22 @@ class JeopardyGame {
                 // Uppdatera ansikten permanent
                 this.setPlayerFaces(winnerIndex);
 
+                // Sätt flagga för att kunna stänga med PageDown
+                this.showingDeathCategoryAnswer = true;
+
                 // Vänta 10 sekunder innan modalen stängs
-                setTimeout(() => {
+                this.autoCloseTimeout = setTimeout(() => {
+                    this.showingDeathCategoryAnswer = false;
                     this.closeQuestionModal();
                 }, 10000);
-            }, 200);
+            }, 400);
         } else {
-            // Vänta 200ms för att visa glatt ansikte, sedan stäng
+            // Vänta 400ms för att visa glatt ansikte, sedan stäng
             setTimeout(() => {
                 // Uppdatera ansikten permanent
                 this.setPlayerFaces(winnerIndex);
                 this.closeQuestionModal();
-            }, 200);
+            }, 400);
         }
     }
 
@@ -802,7 +811,7 @@ class JeopardyGame {
             this.players[this.currentOwner].score -= wager;
             this.updatePlayerScores();
 
-            // Visa ledset ansikte i 0.2 sekunder
+            // Visa ledset ansikte i 0.4 sekunder
             const playerNames = ['david', 'ludde', 'lina', 'hanna'];
             const playerImageSrc = `images/${playerNames[this.currentOwner]}_ledsen.png`;
             const player = this.players[this.currentOwner];
@@ -820,7 +829,7 @@ class JeopardyGame {
                 this.setPlayerFaces(null);
                 this.markQuestionAsAnswered();
                 this.closeQuestionModal();
-            }, 200);
+            }, 400);
         } else if (this.buzzerWinner !== null) {
             // Vanlig fråga
             const value = this.currentQuestion.data.value;
@@ -830,7 +839,7 @@ class JeopardyGame {
             const playerElement = document.getElementById(`player${this.buzzerWinner + 1}`);
             playerElement.classList.remove('buzzed', 'active');
 
-            // Visa ledset ansikte i 0.2 sekunder
+            // Visa ledset ansikte i 0.4 sekunder
             const playerNames = ['david', 'ludde', 'lina', 'hanna'];
             const playerImageSrc = `images/${playerNames[this.buzzerWinner]}_ledsen.png`;
             const player = this.players[this.buzzerWinner];
@@ -852,12 +861,15 @@ class JeopardyGame {
                     // Återställ frågetexten
                     document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
 
-                    // Intro-ljudet fortsätter spela automatiskt, behöver inte göra något
+                    // Fortsätt spela intro-ljud om det var pausat
+                    if (this.introAudio && this.introAudio.paused) {
+                        this.introAudio.play().catch(() => {});
+                    }
 
                     // Starta ny timer
                     const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
                     this.startQuestionTimer(isDeathCategory ? 20 : 10);
-                }, 200);
+                }, 400);
             } else {
                 setTimeout(() => {
                     // Alla har försökt och ingen lyckas - spela inget_svar ljud
@@ -868,7 +880,7 @@ class JeopardyGame {
 
                     this.markQuestionAsAnswered();
                     this.closeQuestionModal();
-                }, 200);
+                }, 400);
             }
         }
     }
@@ -897,6 +909,7 @@ class JeopardyGame {
         this.buzzerWinner = null;
         this.currentQuestion = null;
         this.answerShown = false;
+        this.showingDeathCategoryAnswer = false;
 
         document.querySelectorAll('.player').forEach(p => {
             p.classList.remove('active', 'buzzed');
@@ -1492,6 +1505,18 @@ class JeopardyGame {
 
             // Vanlig frågemodal eller Daily Double-fråga
             if (!modal.classList.contains('hidden')) {
+                // PageDown för att stänga dödskateg orifråga när den visas efter rätt svar
+                if (e.key === 'PageDown' && this.showingDeathCategoryAnswer) {
+                    e.preventDefault();
+                    if (this.autoCloseTimeout) {
+                        clearTimeout(this.autoCloseTimeout);
+                        this.autoCloseTimeout = null;
+                    }
+                    this.showingDeathCategoryAnswer = false;
+                    this.closeQuestionModal();
+                    return;
+                }
+
                 // Högerpil - rätt svar (om någon har buzzat ELLER om det är Daily Double)
                 if (e.key === 'PageDown' && (this.buzzerWinner !== null || this.currentQuestion.isDailyDouble)) {
                     e.preventDefault();

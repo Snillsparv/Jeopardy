@@ -163,7 +163,7 @@ header {
     border-radius: 5px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
     transition: transform 0.2s, background 0.2s;
-    min-height: 100px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -308,10 +308,15 @@ header {
     background: #060CE9;
     padding: 80px;
     border-radius: 15px;
-    max-width: 1400px;
-    width: 95%;
+    width: 95vw;
+    height: 95vh;
+    max-width: none;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: auto;
 }
 
 .final-modal {
@@ -450,7 +455,6 @@ header {
     width: 120px;
     height: 120px;
     object-fit: cover;
-    border: 3px solid #ffd700;
 }
 
 .standings-player-info {
@@ -533,7 +537,6 @@ header {
     width: 300px;
     height: 300px;
     object-fit: cover;
-    border: 5px solid #ffd700;
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
     margin-bottom: 20px;
 }
@@ -578,7 +581,6 @@ header {
     width: 120px;
     height: 120px;
     object-fit: cover;
-    border: 3px solid #888;
     margin-bottom: 15px;
 }
 
