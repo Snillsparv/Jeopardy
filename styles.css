@@ -339,6 +339,24 @@ header {
     justify-content: center;
 }
 
+/* Frågebilder - enhetlig storlek */
+.question-image {
+    width: 500px;
+    height: 500px;
+    object-fit: contain;
+    background: rgba(0, 0, 0, 0.3);
+    border: 3px solid #ffd700;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 20px 0;
+}
+
+/* Intro-frågor */
+.intro-question {
+    text-align: center;
+    padding: 40px;
+}
+
 .question-answer {
     font-size: 1.8rem;
     color: #90EE90;

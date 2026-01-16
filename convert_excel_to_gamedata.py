@@ -38,8 +38,8 @@ def process_question(question_text):
         image_slug = slugify(image_name)
         image_path = f"images/questions/{image_slug}.png"
         media_files.append(('image', image_path, image_name))
-        # Ersätt [text] med bildtagg
-        question_text = re.sub(r'\[.*?\]', f'<img src="{image_path}" alt="{image_name}" style="max-width: 600px; max-height: 400px; margin: 20px 0;">', question_text)
+        # Ersätt [text] med bildtagg - enhetlig storlek
+        question_text = re.sub(r'\[.*?\]', f'<img src="{image_path}" alt="{image_name}" class="question-image">', question_text)
 
     # Kolla efter intro-frågor (med eller utan kolon)
     intro_match = re.match(r'Intro:?\s*(.*)', question_text, re.IGNORECASE)
@@ -48,8 +48,8 @@ def process_question(question_text):
         song_slug = slugify(song_name)
         audio_path = f"sounds/intros/{song_slug}.mp3"
         media_files.append(('audio', audio_path, song_name))
-        # Ersätt med ljudtagg
-        question_text = f'<div style="text-align: center;"><p style="font-size: 2rem; margin-bottom: 20px;">Lyssna på introt:</p><audio controls autoplay src="{audio_path}"></audio></div>'
+        # Ersätt med data-attribut för att spela i bakgrunden
+        question_text = f'<div class="intro-question" data-audio-src="{audio_path}"><p style="font-size: 2.5rem;">🎵 Lyssna på introt 🎵</p></div>'
 
     return question_text, media_files
 

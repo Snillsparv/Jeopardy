@@ -20,11 +20,11 @@ const gameData = {
                 {value: 500, question: "Företaget som ligger bakom chatboten Claude, uppkallad efter informationsteorins fader Claude Shannon.", answer: ""},
             ],
             [
-                {value: 100, question: "<img src=\"images/questions/snusmumriken.png\" alt=\"Snusmumriken\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 200, question: "<img src=\"images/questions/snorkfroken.png\" alt=\"Snorkfröken\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 300, question: "<img src=\"images/questions/sniff.png\" alt=\"Sniff\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 400, question: "<img src=\"images/questions/mymlan.png\" alt=\"Mymlan\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 500, question: "<img src=\"images/questions/too_ticki.png\" alt=\"Too-ticki\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
+                {value: 100, question: "<img src=\"images/questions/snusmumriken.png\" alt=\"Snusmumriken\" class=\"question-image\">", answer: ""},
+                {value: 200, question: "<img src=\"images/questions/snorkfroken.png\" alt=\"Snorkfröken\" class=\"question-image\">", answer: ""},
+                {value: 300, question: "<img src=\"images/questions/sniff.png\" alt=\"Sniff\" class=\"question-image\">", answer: ""},
+                {value: 400, question: "<img src=\"images/questions/mymlan.png\" alt=\"Mymlan\" class=\"question-image\">", answer: ""},
+                {value: 500, question: "<img src=\"images/questions/too_ticki.png\" alt=\"Too-ticki\" class=\"question-image\">", answer: ""},
             ],
             [
                 {value: 100, question: "Michelangelos mest kända staty.", answer: ""},
@@ -48,7 +48,7 @@ const gameData = {
                 {value: 500, question: "Så kallas den svarta vertikala linje många gravida får över magen.", answer: ""},
             ],
         ],
-        dailyDoubles: ["4-4"]
+        dailyDoubles: ["5-2"]
     },
 
     round2: {
@@ -62,11 +62,11 @@ const gameData = {
                 {value: 1000, question: "Hematom", answer: ""},
             ],
             [
-                {value: 200, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/dancing_queen_abba.mp3\"></audio></div>", answer: ""},
-                {value: 400, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/i_love_it_icona_pop.mp3\"></audio></div>", answer: ""},
-                {value: 600, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/under_pressure_queen.mp3\"></audio></div>", answer: ""},
-                {value: 800, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/bitter_sweet_symphony_the_verve.mp3\"></audio></div>", answer: ""},
-                {value: 1000, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/seven_nation_army_the_white_stripes.mp3\"></audio></div>", answer: ""},
+                {value: 200, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/dancing_queen_abba.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
+                {value: 400, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/i_love_it_icona_pop.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
+                {value: 600, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/under_pressure_queen.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
+                {value: 800, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/bitter_sweet_symphony_the_verve.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
+                {value: 1000, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/seven_nation_army_the_white_stripes.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
             ],
             [
                 {value: 200, question: "Little Rocket Man.", answer: ""},
@@ -97,7 +97,7 @@ const gameData = {
                 {value: 1000, question: "Det tyska ordet för ett fynd eller en stor succé.", answer: ""},
             ],
         ],
-        dailyDoubles: ["1-4", "2-4"]
+        dailyDoubles: ["0-2", "4-2"]
     },
 
     round3: {
@@ -132,11 +132,11 @@ const gameData = {
                 {value: 1500, question: "Barry, Robin och Maurice.", answer: ""},
             ],
             [
-                {value: 300, question: "<img src=\"images/questions/hela_havet_stormar.png\" alt=\"Hela havet stormar\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 600, question: "<img src=\"images/questions/pogs.png\" alt=\"Pogs\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 900, question: "<img src=\"images/questions/gogos.png\" alt=\"Gogos\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 1200, question: "<img src=\"images/questions/squid_game.png\" alt=\"Squid game\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
-                {value: 1500, question: "<img src=\"images/questions/tunnband.png\" alt=\"Tunnband\" style=\"max-width: 600px; max-height: 400px; margin: 20px 0;\">", answer: ""},
+                {value: 300, question: "<img src=\"images/questions/hela_havet_stormar.png\" alt=\"Hela havet stormar\" class=\"question-image\">", answer: ""},
+                {value: 600, question: "<img src=\"images/questions/pogs.png\" alt=\"Pogs\" class=\"question-image\">", answer: ""},
+                {value: 900, question: "<img src=\"images/questions/gogos.png\" alt=\"Gogos\" class=\"question-image\">", answer: ""},
+                {value: 1200, question: "<img src=\"images/questions/squid_game.png\" alt=\"Squid game\" class=\"question-image\">", answer: ""},
+                {value: 1500, question: "<img src=\"images/questions/tunnband.png\" alt=\"Tunnband\" class=\"question-image\">", answer: ""},
             ],
             [
                 {value: 300, question: "Den stora byggnad där Joakim förvarar sina pengar.", answer: ""},
@@ -146,7 +146,7 @@ const gameData = {
                 {value: 1500, question: "Joakims yngsta syster tillika Kalle Ankas mamma.", answer: ""},
             ],
         ],
-        dailyDoubles: ["1-1", "4-1", "2-0"]
+        dailyDoubles: ["3-1", "1-3", "3-2"]
     },
 
     final: {

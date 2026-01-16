@@ -526,6 +526,12 @@ class JeopardyGame {
         // Sätt alla spelare till neutrala när ny fråga visas
         this.setPlayerFaces(null);
 
+        // Kolla om det är en intro-fråga och spela ljudet i bakgrunden
+        const introQuestion = document.querySelector('.intro-question');
+        if (introQuestion && introQuestion.dataset.audioSrc) {
+            this.playSound(introQuestion.dataset.audioSrc, 0.7);
+        }
+
         // Aktivera buzzer och starta 10-sekunders timer
         this.activateBuzzer();
         this.startQuestionTimer();
@@ -544,6 +550,9 @@ class JeopardyGame {
                 this.clearTimers();
                 // Automatiskt stäng frågan efter 10 sekunder
                 if (!this.answerShown) {
+                    // Stoppa intro-ljud om det spelar
+                    this.stopSound();
+
                     // Ingen lyckas svara - spela inget_svar ljud
                     this.playSound('sounds/inget_svar.mp3', 0.5);
 
@@ -663,6 +672,9 @@ class JeopardyGame {
         if (this.buzzerWinner === null) {
             this.buzzerWinner = playerIndex;
             this.buzzerActive = false;
+
+            // Stoppa intro-ljud om det spelar
+            this.stopSound();
 
             // Spela buzzer-ljud
             this.playSound('sounds/buzzer.mp3', 0.6);
