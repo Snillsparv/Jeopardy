@@ -483,10 +483,6 @@ class JeopardyGame {
                     min="0" max="${maxWager}" value="${Math.min(1000, maxWager)}"
                     step="100"
                     style="font-size: 2.5rem; padding: 20px; width: 350px; text-align: center; border: 3px solid #ffd700; border-radius: 10px;">
-                <br><br>
-                <p style="font-size: 1rem; color: #aaa; margin-top: 10px;">
-                    Tryck högerpil (→) för att fortsätta
-                </p>
             </div>
         `;
 

@@ -86,9 +86,6 @@
             <div class="modal-content standings-content">
                 <h2 style="font-size: 3rem; margin-bottom: 40px; color: #ffd700;">STÄLLNING INFÖR FINAL JEOPARDY</h2>
                 <div id="standingsPlayers" class="standings-players"></div>
-                <p style="font-size: 1.2rem; color: #aaa; margin-top: 40px;">
-                    Tryck Page Down för att fortsätta
-                </p>
             </div>
         </div>
 
@@ -98,18 +95,12 @@
                 <!-- Initial FINAL! screen -->
                 <div id="finalIntroSection" class="final-section">
                     <h2 style="font-size: 5rem; color: #ff6b6b; margin: 50px 0;">FINAL!</h2>
-                    <p style="font-size: 1.2rem; color: #aaa; margin-top: 30px;">
-                        Tryck högerpil (→) för att avslöja kategori
-                    </p>
                 </div>
 
                 <!-- Kategori-avslöjning -->
                 <div id="finalCategoryRevealSection" class="final-section hidden">
                     <h2>FINAL JEOPARDY!</h2>
                     <div class="final-category" id="finalCategory" style="font-size: 2rem; margin: 40px 0;"></div>
-                    <p style="font-size: 1.2rem; color: #aaa; margin-top: 30px;">
-                        Tryck högerpil (→) för att börja satsa
-                    </p>
                 </div>
 
                 <!-- Insatser en spelare i taget -->
@@ -124,25 +115,16 @@
                     <label style="font-size: 1.5rem; display: block; margin: 20px 0;">Välj insats:</label>
                     <input type="number" id="finalWagerInput" min="0" step="100"
                         style="font-size: 2.5rem; padding: 20px; width: 350px; text-align: center; border: 3px solid #ffd700; border-radius: 10px; margin: 10px 0;">
-                    <p style="font-size: 1rem; color: #aaa; margin-top: 15px;">
-                        Tryck Enter eller Page Down för att bekräfta
-                    </p>
                 </div>
 
                 <!-- Kategori-visa (efter alla satsat) -->
                 <div class="final-section hidden" id="finalCategorySection">
                     <p style="font-size: 1.3rem; margin: 20px 0;">Alla har satsat!</p>
-                    <p style="font-size: 1rem; color: #aaa; margin-top: 15px;">
-                        Tryck Page Down för att visa fråga
-                    </p>
                 </div>
 
                 <!-- Fråga -->
                 <div class="final-question hidden" id="finalQuestionSection">
                     <div class="question-text" id="finalQuestionText"></div>
-                    <p style="font-size: 1rem; color: #aaa; margin-top: 30px;">
-                        Page Down för att fortsätta när musiken slutat
-                    </p>
                 </div>
 
                 <!-- Svar -->
@@ -156,8 +138,8 @@
                     <p id="revealWager" style="font-size: 1.5rem; color: #ffd700; margin: 20px 0;">Satsning: 0 kr</p>
                     <p style="font-size: 1.2rem; margin: 20px 0;">Svarade spelaren rätt?</p>
                     <div class="modal-buttons">
-                        <button id="revealCorrectBtn" class="btn btn-correct">Rätt (Page Down)</button>
-                        <button id="revealWrongBtn" class="btn btn-wrong">Fel (Page Up)</button>
+                        <button id="revealCorrectBtn" class="btn btn-correct">Rätt</button>
+                        <button id="revealWrongBtn" class="btn btn-wrong">Fel</button>
                     </div>
                 </div>
             </div>
