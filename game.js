@@ -502,7 +502,7 @@ class JeopardyGame {
         document.getElementById('questionValue').style.fontSize = '3rem';
         document.getElementById('questionValue').textContent = `DUBBELCHANS: ${wager} kr`;
 
-        document.getElementById('questionText').textContent = this.currentQuestion.data.question;
+        document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
         document.getElementById('questionAnswer').classList.add('hidden');
 
         document.getElementById('buzzerStatus').textContent =
@@ -517,7 +517,7 @@ class JeopardyGame {
         document.getElementById('questionValue').style.fontSize = '3rem';
         document.getElementById('questionValue').textContent = this.currentQuestion.data.value + ' kr';
         document.getElementById('questionCategory').textContent = this.currentQuestion.category;
-        document.getElementById('questionText').textContent = this.currentQuestion.data.question;
+        document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
         document.getElementById('buzzerStatus').textContent = '';
 
         // Dölj allt som inte behövs
@@ -907,7 +907,7 @@ class JeopardyGame {
         // Spara kategori och fråga
         document.getElementById('finalCategory').textContent = gameData.final.category;
         document.getElementById('finalCategorySmall').textContent = gameData.final.category;
-        document.getElementById('finalQuestionText').textContent = gameData.final.question;
+        document.getElementById('finalQuestionText').innerHTML = gameData.final.question;
         document.getElementById('finalAnswerText').textContent = gameData.final.answer;
 
         // Visa FINAL! screen först
