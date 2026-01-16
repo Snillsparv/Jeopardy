@@ -555,8 +555,8 @@ header {
 }
 
 .winner-image {
-    width: 400px;
-    height: 400px;
+    width: 280px;
+    height: 280px;
     object-fit: contain;
     border-radius: 15px;
     border: 8px solid #ffd700;
@@ -625,8 +625,8 @@ header {
 }
 
 .loser-image {
-    width: 150px;
-    height: 150px;
+    width: 180px;
+    height: 180px;
     object-fit: contain;
     margin-bottom: 15px;
     border-radius: 10px;
