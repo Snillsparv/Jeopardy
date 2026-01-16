@@ -1374,6 +1374,13 @@ class JeopardyGame {
                 return;
             }
 
+            // B key - debug clear board
+            if (e.key === 'b' || e.key === 'B') {
+                e.preventDefault();
+                this.debugClearBoard();
+                return;
+            }
+
             // If score modal is open, don't process other keys
             if (!scoreModal.classList.contains('hidden')) {
                 return;
@@ -1542,12 +1549,10 @@ class JeopardyGame {
 
         // Other buttons
         const newGameBtn = document.getElementById('newGameBtn');
-        const debugClearBoardBtn = document.getElementById('debugClearBoardBtn');
         const applyScoresBtn = document.getElementById('applyScoresBtn');
         const cancelScoresBtn = document.getElementById('cancelScoresBtn');
 
         if (newGameBtn) newGameBtn.onclick = () => this.newGame();
-        if (debugClearBoardBtn) debugClearBoardBtn.onclick = () => this.debugClearBoard();
         if (applyScoresBtn) applyScoresBtn.onclick = () => this.applyScoreChanges();
         if (cancelScoresBtn) cancelScoresBtn.onclick = () => this.cancelScoreChanges();
     }
