@@ -532,14 +532,15 @@ class JeopardyGame {
             this.playSound(introQuestion.dataset.audioSrc, 0.7);
         }
 
-        // Aktivera buzzer och starta 10-sekunders timer
+        // Aktivera buzzer och starta timer (20s för "Vem har dött", annars 10s)
         this.activateBuzzer();
-        this.startQuestionTimer();
+        const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
+        this.startQuestionTimer(isDeathCategory ? 20 : 10);
     }
 
-    startQuestionTimer() {
+    startQuestionTimer(seconds = 10) {
         this.clearTimers();
-        this.timeRemaining = 10;
+        this.timeRemaining = seconds;
         // Ingen synlig timer under frågan, bara intern nedräkning
         document.getElementById('timerDisplay').classList.add('hidden');
 
@@ -679,11 +680,23 @@ class JeopardyGame {
             // Spela buzzer-ljud
             this.playSound('sounds/buzzer.mp3', 0.6);
 
+            // Dölj frågetexten och visa spelarens ansikte istället
+            const player = this.players[playerIndex];
+            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerImageSrc = `images/${playerNames[playerIndex]}.png`;
+
+            document.getElementById('questionText').innerHTML = `
+                <div style="text-align: center;">
+                    <img src="${playerImageSrc}" alt="${player.name}"
+                        style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; border: 5px solid #ffd700; margin-bottom: 20px;">
+                    <p style="font-size: 2rem; color: #ffd700;">${player.name} svarar...</p>
+                </div>
+            `;
+
             // Stoppa frågetimer och starta svartimer
             this.clearTimers();
             this.startAnswerTimer();
 
-            const player = this.players[playerIndex];
             document.getElementById('buzzerStatus').textContent = `${player.name} buzzade in!`;
 
             const playerElement = document.getElementById(`player${playerIndex + 1}`);
@@ -722,7 +735,21 @@ class JeopardyGame {
         }
 
         this.markQuestionAsAnswered();
-        this.closeQuestionModal();
+
+        // För "Vem har dött" kategorin, visa frågan i 10 sekunder extra
+        const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
+        if (isDeathCategory) {
+            // Visa frågetexten igen
+            document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
+            document.getElementById('buzzerStatus').textContent = '✓ Rätt svar!';
+
+            // Vänta 10 sekunder innan modalen stängs
+            setTimeout(() => {
+                this.closeQuestionModal();
+            }, 10000);
+        } else {
+            this.closeQuestionModal();
+        }
     }
 
     answerWrong() {
@@ -753,8 +780,12 @@ class JeopardyGame {
                 this.buzzerActive = true;
                 document.getElementById('buzzerStatus').textContent = '';
 
+                // Återställ frågetexten
+                document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
+
                 // Starta ny timer
-                this.startQuestionTimer();
+                const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
+                this.startQuestionTimer(isDeathCategory ? 20 : 10);
             } else {
                 // Alla har försökt och ingen lyckas - spela inget_svar ljud
                 this.playSound('sounds/inget_svar.mp3', 0.5);
