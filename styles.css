@@ -121,7 +121,7 @@ header {
     background: #060CE9;
     padding: 20px;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
     text-transform: uppercase;
     border-radius: 5px;
@@ -131,6 +131,9 @@ header {
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .category.flipping {
