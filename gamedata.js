@@ -150,8 +150,8 @@ const gameData = {
     },
 
     final: {
-        category: 'Final Jeopardy',
-        question: 'Final Jeopardy-fråga här',
-        answer: ''
+        category: 'Grundämnen',
+        question: 'Den vanligaste ädelgasen i jordens atmosfär (atomnummer 18) som även används i glödlampor för att skydda volframtråden från oxidering.',
+        answer: 'Argon'
     }
 };
