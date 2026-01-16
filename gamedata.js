@@ -48,7 +48,7 @@ const gameData = {
                 {value: 500, question: "Så kallas den svarta vertikala linje många gravida får över magen.", answer: ""},
             ],
         ],
-        dailyDoubles: ["0-4"]
+        dailyDoubles: ["4-4"]
     },
 
     round2: {
@@ -66,7 +66,7 @@ const gameData = {
                 {value: 400, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/i_love_it_icona_pop.mp3\"></audio></div>", answer: ""},
                 {value: 600, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/under_pressure_queen.mp3\"></audio></div>", answer: ""},
                 {value: 800, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/bitter_sweet_symphony_the_verve.mp3\"></audio></div>", answer: ""},
-                {value: 1000, question: "Intro Seven Nation Army (The White Stripes)", answer: ""},
+                {value: 1000, question: "<div style=\"text-align: center;\"><p style=\"font-size: 2rem; margin-bottom: 20px;\">Lyssna på introt:</p><audio controls autoplay src=\"sounds/intros/seven_nation_army_the_white_stripes.mp3\"></audio></div>", answer: ""},
             ],
             [
                 {value: 200, question: "Little Rocket Man.", answer: ""},
@@ -97,7 +97,7 @@ const gameData = {
                 {value: 1000, question: "Det tyska ordet för ett fynd eller en stor succé.", answer: ""},
             ],
         ],
-        dailyDoubles: ["4-4", "2-3"]
+        dailyDoubles: ["1-4", "2-4"]
     },
 
     round3: {
@@ -146,7 +146,7 @@ const gameData = {
                 {value: 1500, question: "Joakims yngsta syster tillika Kalle Ankas mamma.", answer: ""},
             ],
         ],
-        dailyDoubles: ["2-3", "0-1", "3-0"]
+        dailyDoubles: ["1-1", "4-1", "2-0"]
     },
 
     final: {

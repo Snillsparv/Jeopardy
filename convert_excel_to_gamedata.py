@@ -41,8 +41,8 @@ def process_question(question_text):
         # Ersätt [text] med bildtagg
         question_text = re.sub(r'\[.*?\]', f'<img src="{image_path}" alt="{image_name}" style="max-width: 600px; max-height: 400px; margin: 20px 0;">', question_text)
 
-    # Kolla efter intro-frågor
-    intro_match = re.match(r'Intro:\s*(.*)', question_text, re.IGNORECASE)
+    # Kolla efter intro-frågor (med eller utan kolon)
+    intro_match = re.match(r'Intro:?\s*(.*)', question_text, re.IGNORECASE)
     if intro_match:
         song_name = intro_match.group(1).strip()
         song_slug = slugify(song_name)
