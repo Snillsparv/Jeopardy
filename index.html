@@ -120,6 +120,12 @@
                     <div class="question-text" id="finalQuestionText"></div>
                 </div>
 
+                <!-- Rättning -->
+                <div class="final-section hidden" id="finalCorrectionSection">
+                    <h1 style="font-size: 6rem; color: #ffd700; text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);">RÄTTNING!</h1>
+                    <p style="font-size: 1.5rem; margin-top: 30px;">Tryck för att fortsätta</p>
+                </div>
+
                 <!-- Svar -->
                 <div class="final-answer hidden" id="finalAnswerSection">
                     <div class="question-answer" id="finalAnswerText"></div>
@@ -127,13 +133,16 @@
 
                 <!-- Revealing spelares svar -->
                 <div id="finalRevealSection" class="final-reveal hidden">
-                    <h3 id="revealPlayerName">Spelare X</h3>
-                    <p id="revealWager" style="font-size: 1.5rem; color: #ffd700; margin: 20px 0;">Satsning: 0 kr</p>
+                    <img id="revealPlayerImage" src="" alt="" style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin-bottom: 20px;">
+                    <h3 id="revealPlayerName" style="font-size: 3rem; color: #ffd700;">Spelare X</h3>
+                    <p id="revealCurrentScore" style="font-size: 2rem; color: white; margin: 10px 0;">Nuvarande: 0 kr</p>
+                    <p id="revealWager" style="font-size: 1.5rem; color: #ffd700; margin: 10px 0;">Satsning: 0 kr</p>
                     <p style="font-size: 1.2rem; margin: 20px 0;">Svarade spelaren rätt?</p>
                     <div class="modal-buttons">
                         <button id="revealCorrectBtn" class="btn btn-correct">Rätt</button>
                         <button id="revealWrongBtn" class="btn btn-wrong">Fel</button>
                     </div>
+                    <p id="revealFinalScore" style="font-size: 2.5rem; color: #ffd700; margin-top: 20px; display: none;">Slutpoäng: 0 kr</p>
                 </div>
             </div>
         </div>

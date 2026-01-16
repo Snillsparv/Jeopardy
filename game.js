@@ -195,6 +195,11 @@ class JeopardyGame {
             categoryDiv.className = 'category';
             categoryDiv.dataset.categoryIndex = index;
 
+            // Lägg till mindre font för långa kategorinamn
+            if (category.length > 20) {
+                categoryDiv.classList.add('category-long');
+            }
+
             // Visa antingen "JEOPARDY" eller ämnet beroende på om det är avslöjat
             if (this.categoriesRevealed || index < this.revealedCategories) {
                 categoryDiv.textContent = category;
@@ -1115,11 +1120,21 @@ class JeopardyGame {
         document.getElementById('finalQuestionSection').classList.remove('hidden');
 
         // Spela Final Jeopardy-musik
-        this.playSound('sounds/musik_finalsvar.mp3', 0.7);
+        const music = this.playSound('sounds/musik_finalsvar.mp3', 0.7);
+
+        // När musiken tar slut, visa rättningsskärmen
+        music.onended = () => {
+            this.showCorrectionScreen();
+        };
+    }
+
+    showCorrectionScreen() {
+        document.getElementById('finalQuestionSection').classList.add('hidden');
+        document.getElementById('finalCorrectionSection').classList.remove('hidden');
     }
 
     showFinalAnswer() {
-        document.getElementById('finalQuestionSection').classList.add('hidden');
+        document.getElementById('finalCorrectionSection').classList.add('hidden');
         document.getElementById('finalAnswerSection').classList.remove('hidden');
         document.getElementById('finalRevealSection').classList.remove('hidden');
 
@@ -1141,9 +1156,16 @@ class JeopardyGame {
 
         const player = this.players[this.finalCurrentPlayer];
         const wager = this.finalWagers[this.finalCurrentPlayer];
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerImageSrc = `images/${playerNames[this.finalCurrentPlayer]}.png`;
 
+        // Återställ och visa spelarinformation
+        document.getElementById('revealPlayerImage').src = playerImageSrc;
         document.getElementById('revealPlayerName').textContent = player.name;
+        document.getElementById('revealCurrentScore').textContent = `Nuvarande: ${player.score} kr`;
         document.getElementById('revealWager').textContent = `Satsning: ${wager} kr`;
+        document.getElementById('revealWager').style.display = 'block';
+        document.getElementById('revealFinalScore').style.display = 'none';
 
         document.getElementById('revealCorrectBtn').classList.remove('hidden');
         document.getElementById('revealWrongBtn').classList.remove('hidden');
@@ -1151,32 +1173,62 @@ class JeopardyGame {
 
     finalAnswerCorrect() {
         const wager = this.finalWagers[this.finalCurrentPlayer];
+        const oldScore = this.players[this.finalCurrentPlayer].score;
         this.players[this.finalCurrentPlayer].score += wager;
+        const newScore = this.players[this.finalCurrentPlayer].score;
         this.updatePlayerScores();
 
         document.getElementById('revealCorrectBtn').classList.add('hidden');
         document.getElementById('revealWrongBtn').classList.add('hidden');
 
-        this.finalCurrentPlayer++;
+        // Visa glatt ansikte
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const gladImageSrc = `images/${playerNames[this.finalCurrentPlayer]}_glad.png`;
+        document.getElementById('revealPlayerImage').src = gladImageSrc;
+        document.getElementById('revealCurrentScore').innerHTML = `<span style="color: #90EE90;">✓ Rätt svar!</span>`;
+        document.getElementById('revealWager').style.display = 'none';
 
+        // Vänta 2 sekunder, sedan visa slutpoäng
         setTimeout(() => {
-            this.showNextPlayerReveal();
-        }, 1000);
+            document.getElementById('revealFinalScore').textContent = `Slutpoäng: ${newScore} kr`;
+            document.getElementById('revealFinalScore').style.display = 'block';
+
+            // Vänta 2 sekunder till, sedan nästa spelare
+            setTimeout(() => {
+                this.finalCurrentPlayer++;
+                this.showNextPlayerReveal();
+            }, 2000);
+        }, 2000);
     }
 
     finalAnswerWrong() {
         const wager = this.finalWagers[this.finalCurrentPlayer];
+        const oldScore = this.players[this.finalCurrentPlayer].score;
         this.players[this.finalCurrentPlayer].score -= wager;
+        const newScore = this.players[this.finalCurrentPlayer].score;
         this.updatePlayerScores();
 
         document.getElementById('revealCorrectBtn').classList.add('hidden');
         document.getElementById('revealWrongBtn').classList.add('hidden');
 
-        this.finalCurrentPlayer++;
+        // Visa ledset ansikte
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const sadImageSrc = `images/${playerNames[this.finalCurrentPlayer]}_ledsen.png`;
+        document.getElementById('revealPlayerImage').src = sadImageSrc;
+        document.getElementById('revealCurrentScore').innerHTML = `<span style="color: #dc3545;">✗ Fel svar!</span>`;
+        document.getElementById('revealWager').style.display = 'none';
 
+        // Vänta 2 sekunder, sedan visa slutpoäng
         setTimeout(() => {
-            this.showNextPlayerReveal();
-        }, 1000);
+            document.getElementById('revealFinalScore').textContent = `Slutpoäng: ${newScore} kr`;
+            document.getElementById('revealFinalScore').style.display = 'block';
+
+            // Vänta 2 sekunder till, sedan nästa spelare
+            setTimeout(() => {
+                this.finalCurrentPlayer++;
+                this.showNextPlayerReveal();
+            }, 2000);
+        }, 2000);
     }
 
     finishGame() {
@@ -1449,9 +1501,16 @@ class JeopardyGame {
                 }
             }
 
-            // Final Jeopardy Question Section - visa svaret
+            // Final Jeopardy Question Section - musiken spelar, vänta tills den är klar
             const finalQuestionSection = document.getElementById('finalQuestionSection');
             if (!finalQuestionSection.classList.contains('hidden') &&
+                !finalModal.classList.contains('hidden')) {
+                // Låt musiken spela klart, ingen action här
+            }
+
+            // Final Jeopardy Correction Section - visa svaret
+            const finalCorrectionSection = document.getElementById('finalCorrectionSection');
+            if (!finalCorrectionSection.classList.contains('hidden') &&
                 !finalModal.classList.contains('hidden')) {
                 if (e.key === 'PageDown') {
                     e.preventDefault();

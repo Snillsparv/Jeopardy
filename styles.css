@@ -136,6 +136,11 @@ header {
     hyphens: auto;
 }
 
+/* Mindre font för långa kategorinamn */
+.category-long {
+    font-size: 0.8rem;
+}
+
 .category.flipping {
     animation: flipCard 0.6s ease-in-out;
 }
@@ -317,10 +322,6 @@ header {
     flex-direction: column;
     justify-content: center;
     overflow: auto;
-}
-
-.final-modal {
-    max-width: 1000px;
 }
 
 .question-value {
@@ -519,40 +520,79 @@ header {
 }
 
 /* Winner Modal */
-.winner-modal-content {
-    max-width: 1000px !important;
-    padding: 50px 60px !important;
-}
-
 .winner-section {
     text-align: center;
     margin: 30px 0;
-    padding: 30px;
-    background: rgba(255, 215, 0, 0.1);
-    border-radius: 15px;
-    border: 3px solid #ffd700;
+    padding: 50px;
+    background: linear-gradient(135deg,
+        rgba(255, 215, 0, 0.3) 0%,
+        rgba(255, 193, 7, 0.4) 50%,
+        rgba(255, 215, 0, 0.3) 100%);
+    border-radius: 20px;
+    border: 5px solid #ffd700;
+    box-shadow:
+        0 0 60px rgba(255, 215, 0, 0.8),
+        inset 0 0 60px rgba(255, 215, 0, 0.2);
+    animation: goldPulse 2s ease-in-out infinite;
+}
+
+@keyframes goldPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 60px rgba(255, 215, 0, 0.8),
+            inset 0 0 60px rgba(255, 215, 0, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 80px rgba(255, 215, 0, 1),
+            inset 0 0 80px rgba(255, 215, 0, 0.4);
+    }
 }
 
 .winner-image {
-    width: 300px;
-    height: 300px;
+    width: 400px;
+    height: 400px;
     object-fit: cover;
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-    margin-bottom: 20px;
+    border-radius: 50%;
+    border: 8px solid #ffd700;
+    box-shadow:
+        0 0 50px rgba(255, 215, 0, 1),
+        0 0 100px rgba(255, 215, 0, 0.6);
+    margin-bottom: 30px;
+    animation: goldGlow 2s ease-in-out infinite;
+}
+
+@keyframes goldGlow {
+    0%, 100% {
+        box-shadow:
+            0 0 50px rgba(255, 215, 0, 1),
+            0 0 100px rgba(255, 215, 0, 0.6);
+    }
+    50% {
+        box-shadow:
+            0 0 70px rgba(255, 215, 0, 1),
+            0 0 120px rgba(255, 215, 0, 0.8);
+    }
 }
 
 .winner-name {
-    font-size: 3rem;
+    font-size: 4rem;
     font-weight: bold;
     color: #ffd700;
     margin-bottom: 15px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow:
+        0 0 20px rgba(255, 215, 0, 1),
+        0 0 40px rgba(255, 215, 0, 0.8),
+        3px 3px 6px rgba(0, 0, 0, 0.8);
 }
 
 .winner-score {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: bold;
-    color: white;
+    color: #ffd700;
+    text-shadow:
+        0 0 15px rgba(255, 215, 0, 0.8),
+        2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .losers-section {
