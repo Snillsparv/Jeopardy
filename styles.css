@@ -557,14 +557,16 @@ header {
 .winner-image {
     width: 400px;
     height: 400px;
-    object-fit: cover;
-    border-radius: 50%;
+    object-fit: contain;
+    border-radius: 15px;
     border: 8px solid #ffd700;
     box-shadow:
         0 0 50px rgba(255, 215, 0, 1),
         0 0 100px rgba(255, 215, 0, 0.6);
     margin-bottom: 30px;
     animation: goldGlow 2s ease-in-out infinite;
+    background: rgba(255, 215, 0, 0.05);
+    padding: 10px;
 }
 
 @keyframes goldGlow {
@@ -623,10 +625,14 @@ header {
 }
 
 .loser-image {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
     margin-bottom: 15px;
+    border-radius: 10px;
+    border: 4px solid #888;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
 }
 
 .loser-rank {

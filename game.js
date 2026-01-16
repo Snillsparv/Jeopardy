@@ -1253,8 +1253,8 @@ class JeopardyGame {
         this.playVideo(`videos/vinnarvideo_${winnerName}.mp4`, () => {
             // När videon är klar, visa vinnarmodalen
 
-            // Visa vinnaren
-            document.getElementById('winnerImage').src = `images/${winnerName}_glad.png`;
+            // Visa vinnaren - använd placeringsbilden från sounds-mappen
+            document.getElementById('winnerImage').src = `sounds/${winnerName}_1.png`;
             document.getElementById('winnerName').textContent = winner.name;
             document.getElementById('winnerScore').textContent = `${winner.score} kr`;
 
@@ -1266,9 +1266,8 @@ class JeopardyGame {
                 const rank = index + 2; // 2:a, 3:e, 4:e
                 const rankText = rank === 2 ? '2:a plats' : rank === 3 ? '3:e plats' : '4:e plats';
                 const imageName = playerNames[player.index];
-                const imageSrc = rank === 2
-                    ? `images/${imageName}.png`
-                    : `images/${imageName}_ledsen.png`;
+                // Använd placeringsbilderna från sounds-mappen
+                const imageSrc = `sounds/${imageName}_${rank}.png`;
 
                 return `
                     <div class="loser-item">
