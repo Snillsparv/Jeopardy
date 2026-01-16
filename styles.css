@@ -600,6 +600,63 @@ header {
     color: #ccc;
 }
 
+/* Score Management Modal */
+.score-modal-content {
+    max-width: 900px !important;
+    padding: 40px 50px !important;
+}
+
+.score-management-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.score-player-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+}
+
+.score-player-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #ffd700;
+    margin-bottom: 15px;
+}
+
+.score-player-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 15px;
+}
+
+.score-input {
+    font-size: 2rem;
+    padding: 15px;
+    width: 200px;
+    text-align: center;
+    border: 3px solid #ffd700;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: bold;
+}
+
+.score-input:focus {
+    outline: none;
+    border-color: #ffed4e;
+    background: rgba(255, 255, 255, 0.15);
+}
+
 /* Final Jeopardy */
 .final-category {
     font-size: 2rem;

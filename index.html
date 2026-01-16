@@ -167,6 +167,43 @@
                 <button id="newGameBtn" class="btn" style="margin-top: 30px; font-size: 1.3rem; padding: 15px 40px;">Nytt spel</button>
             </div>
         </div>
+
+        <!-- Score Management Modal -->
+        <div id="scoreModal" class="modal hidden">
+            <div class="modal-content score-modal-content">
+                <h2 style="font-size: 2.5rem; color: #ffd700; margin-bottom: 30px;">Justera poäng</h2>
+
+                <div class="score-management-grid">
+                    <div class="score-player-item">
+                        <img src="images/david.png" alt="David" class="score-player-image">
+                        <div class="score-player-name">David</div>
+                        <input type="number" id="scoreInput0" class="score-input" step="100">
+                    </div>
+                    <div class="score-player-item">
+                        <img src="images/ludde.png" alt="Ludde" class="score-player-image">
+                        <div class="score-player-name">Ludde</div>
+                        <input type="number" id="scoreInput1" class="score-input" step="100">
+                    </div>
+                    <div class="score-player-item">
+                        <img src="images/lina.png" alt="Lina" class="score-player-image">
+                        <div class="score-player-name">Lina</div>
+                        <input type="number" id="scoreInput2" class="score-input" step="100">
+                    </div>
+                    <div class="score-player-item">
+                        <img src="images/hanna.png" alt="Hanna" class="score-player-image">
+                        <div class="score-player-name">Hanna</div>
+                        <input type="number" id="scoreInput3" class="score-input" step="100">
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <button id="applyScoresBtn" class="btn" style="font-size: 1.3rem; padding: 15px 40px; margin-right: 15px;">Applicera</button>
+                    <button id="cancelScoresBtn" class="btn" style="font-size: 1.3rem; padding: 15px 40px; background: #666;">Avbryt</button>
+                </div>
+
+                <p style="font-size: 0.9rem; color: #999; margin-top: 20px; text-align: center;">Tryck R för att stänga</p>
+            </div>
+        </div>
     </div>
 
     <!-- Versionsnummer -->

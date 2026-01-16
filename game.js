@@ -1142,6 +1142,47 @@ class JeopardyGame {
         location.reload();
     }
 
+    toggleScoreManagement() {
+        const scoreModal = document.getElementById('scoreModal');
+
+        if (scoreModal.classList.contains('hidden')) {
+            // Öppna modalen och ladda in nuvarande poäng
+            this.players.forEach((player, index) => {
+                const input = document.getElementById(`scoreInput${index}`);
+                if (input) {
+                    input.value = player.score;
+                }
+            });
+            scoreModal.classList.remove('hidden');
+        } else {
+            // Stäng modalen
+            scoreModal.classList.add('hidden');
+        }
+    }
+
+    applyScoreChanges() {
+        // Uppdatera alla spelarpoäng från inputs
+        this.players.forEach((player, index) => {
+            const input = document.getElementById(`scoreInput${index}`);
+            if (input) {
+                const newScore = parseInt(input.value) || 0;
+                player.score = newScore;
+            }
+        });
+
+        // Uppdatera displayen
+        this.updatePlayerScores();
+        this.updateOwnerDisplay();
+
+        // Stäng modalen
+        document.getElementById('scoreModal').classList.add('hidden');
+    }
+
+    cancelScoreChanges() {
+        // Bara stäng modalen utan att spara ändringar
+        document.getElementById('scoreModal').classList.add('hidden');
+    }
+
     debugClearBoard() {
         // Avslöja allt först
         this.valuesRevealed = true;
@@ -1228,8 +1269,21 @@ class JeopardyGame {
             const modal = document.getElementById('questionModal');
             const finalModal = document.getElementById('finalModal');
             const standingsModal = document.getElementById('standingsModal');
+            const scoreModal = document.getElementById('scoreModal');
             const finalRevealSection = document.getElementById('finalRevealSection');
             const finalWagerSection = document.getElementById('finalWagerSection');
+
+            // R key - toggle score management modal
+            if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                this.toggleScoreManagement();
+                return;
+            }
+
+            // If score modal is open, don't process other keys
+            if (!scoreModal.classList.contains('hidden')) {
+                return;
+            }
 
             // Standings modal - fortsätt till priserna
             if (!standingsModal.classList.contains('hidden') && e.key === 'PageDown') {
@@ -1383,9 +1437,13 @@ class JeopardyGame {
         // Other buttons
         const newGameBtn = document.getElementById('newGameBtn');
         const debugClearBoardBtn = document.getElementById('debugClearBoardBtn');
+        const applyScoresBtn = document.getElementById('applyScoresBtn');
+        const cancelScoresBtn = document.getElementById('cancelScoresBtn');
 
         if (newGameBtn) newGameBtn.onclick = () => this.newGame();
         if (debugClearBoardBtn) debugClearBoardBtn.onclick = () => this.debugClearBoard();
+        if (applyScoresBtn) applyScoresBtn.onclick = () => this.applyScoreChanges();
+        if (cancelScoresBtn) cancelScoresBtn.onclick = () => this.cancelScoreChanges();
     }
 }
 
