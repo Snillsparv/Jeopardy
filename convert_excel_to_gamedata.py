@@ -48,8 +48,8 @@ def process_question(question_text):
         song_slug = slugify(song_name)
         audio_path = f"sounds/intros/{song_slug}.mp3"
         media_files.append(('audio', audio_path, song_name))
-        # Ersätt med data-attribut för att spela i bakgrunden
-        question_text = f'<div class="intro-question" data-audio-src="{audio_path}"><p style="font-size: 2.5rem;">🎵 Lyssna på introt 🎵</p></div>'
+        # Ersätt med data-attribut för att spela i bakgrunden - bara notsymbol
+        question_text = f'<div class="intro-question" data-audio-src="{audio_path}"><p style="font-size: 8rem;">🎵</p></div>'
 
     return question_text, media_files
 

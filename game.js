@@ -37,6 +37,7 @@ class JeopardyGame {
         // Ljud och video
         this.dailyDoubleCount = 0; // Räkna antal Daily Doubles
         this.currentAudio = null; // För att kunna stoppa ljud
+        this.introAudio = null; // Separat för intro-ljud som ska fortsätta
         this.currentVideo = null; // För att kunna stoppa video
 
         this.init();
@@ -105,6 +106,30 @@ class JeopardyGame {
             this.currentAudio.pause();
             this.currentAudio.currentTime = 0;
             this.currentAudio = null;
+        }
+    }
+
+    playIntroSound(soundFile, volume = 0.7) {
+        // Stoppa tidigare intro-ljud om det finns
+        if (this.introAudio) {
+            this.introAudio.pause();
+            this.introAudio.currentTime = 0;
+        }
+
+        this.introAudio = new Audio(soundFile);
+        this.introAudio.volume = volume;
+        this.introAudio.play().catch((error) => {
+            console.log(`Kunde inte spela ${soundFile}:`, error);
+        });
+
+        return this.introAudio;
+    }
+
+    stopIntroSound() {
+        if (this.introAudio) {
+            this.introAudio.pause();
+            this.introAudio.currentTime = 0;
+            this.introAudio = null;
         }
     }
 
@@ -525,7 +550,7 @@ class JeopardyGame {
         // Kolla om det är en intro-fråga och spela ljudet i bakgrunden
         const introQuestion = document.querySelector('.intro-question');
         if (introQuestion && introQuestion.dataset.audioSrc) {
-            this.playSound(introQuestion.dataset.audioSrc, 0.7);
+            this.playIntroSound(introQuestion.dataset.audioSrc, 0.7);
         }
 
         // Aktivera buzzer och starta timer (20s för "Vem har dött", annars 10s)
@@ -548,7 +573,7 @@ class JeopardyGame {
                 // Automatiskt stäng frågan efter 10 sekunder
                 if (!this.answerShown) {
                     // Stoppa intro-ljud om det spelar
-                    this.stopSound();
+                    this.stopIntroSound();
 
                     // Ingen lyckas svara - spela inget_svar ljud
                     this.playSound('sounds/inget_svar.mp3', 0.5);
@@ -670,11 +695,11 @@ class JeopardyGame {
             this.buzzerWinner = playerIndex;
             this.buzzerActive = false;
 
-            // Stoppa intro-ljud om det spelar
-            this.stopSound();
-
+            // Intro-ljud fortsätter spela, spela bara buzzer-ljud ovanpå
             // Spela buzzer-ljud
-            this.playSound('sounds/buzzer.mp3', 0.6);
+            const buzzerSound = new Audio('sounds/buzzer.mp3');
+            buzzerSound.volume = 0.6;
+            buzzerSound.play().catch(() => {});
 
             // Dölj frågetexten och visa spelarens ansikte istället
             const player = this.players[playerIndex];
@@ -684,7 +709,7 @@ class JeopardyGame {
             document.getElementById('questionText').innerHTML = `
                 <div style="text-align: center;">
                     <img src="${playerImageSrc}" alt="${player.name}"
-                        style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; border: 5px solid #ffd700; margin-bottom: 20px;">
+                        style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin-bottom: 20px;">
                     <p style="font-size: 2rem; color: #ffd700;">${player.name} svarar...</p>
                 </div>
             `;
@@ -725,26 +750,46 @@ class JeopardyGame {
         this.updatePlayerScores();
         this.updateOwnerDisplay();
 
-        // Visa vinnaren glad, resten ledsna
-        if (winnerIndex !== null) {
-            this.setPlayerFaces(winnerIndex);
-        }
-
         this.markQuestionAsAnswered();
+
+        // Visa glatt ansikte i 0.2 sekunder
+        if (winnerIndex !== null) {
+            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerImageSrc = `images/${playerNames[winnerIndex]}_glad.png`;
+            const player = this.players[winnerIndex];
+
+            document.getElementById('questionText').innerHTML = `
+                <div style="text-align: center;">
+                    <img src="${playerImageSrc}" alt="${player.name}"
+                        style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin-bottom: 20px;">
+                    <p style="font-size: 2rem; color: #90EE90;">✓ Rätt svar!</p>
+                </div>
+            `;
+        }
 
         // För "Vem har dött" kategorin, visa frågan i 10 sekunder extra
         const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
         if (isDeathCategory) {
-            // Visa frågetexten igen
-            document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
-            document.getElementById('buzzerStatus').textContent = '✓ Rätt svar!';
-
-            // Vänta 10 sekunder innan modalen stängs
+            // Vänta 200ms för att visa glatt ansikte, sedan visa frågan
             setTimeout(() => {
-                this.closeQuestionModal();
-            }, 10000);
+                document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
+                document.getElementById('buzzerStatus').textContent = '✓ Rätt svar!';
+
+                // Uppdatera ansikten permanent
+                this.setPlayerFaces(winnerIndex);
+
+                // Vänta 10 sekunder innan modalen stängs
+                setTimeout(() => {
+                    this.closeQuestionModal();
+                }, 10000);
+            }, 200);
         } else {
-            this.closeQuestionModal();
+            // Vänta 200ms för att visa glatt ansikte, sedan stäng
+            setTimeout(() => {
+                // Uppdatera ansikten permanent
+                this.setPlayerFaces(winnerIndex);
+                this.closeQuestionModal();
+            }, 200);
         }
     }
 
@@ -757,11 +802,25 @@ class JeopardyGame {
             this.players[this.currentOwner].score -= wager;
             this.updatePlayerScores();
 
-            // Alla blir neutrala när Daily Double misslyckas
-            this.setPlayerFaces(null);
+            // Visa ledset ansikte i 0.2 sekunder
+            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerImageSrc = `images/${playerNames[this.currentOwner]}_ledsen.png`;
+            const player = this.players[this.currentOwner];
 
-            this.markQuestionAsAnswered();
-            this.closeQuestionModal();
+            document.getElementById('questionText').innerHTML = `
+                <div style="text-align: center;">
+                    <img src="${playerImageSrc}" alt="${player.name}"
+                        style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin-bottom: 20px;">
+                    <p style="font-size: 2rem; color: #dc3545;">✗ Fel svar!</p>
+                </div>
+            `;
+
+            setTimeout(() => {
+                // Alla blir neutrala när Daily Double misslyckas
+                this.setPlayerFaces(null);
+                this.markQuestionAsAnswered();
+                this.closeQuestionModal();
+            }, 200);
         } else if (this.buzzerWinner !== null) {
             // Vanlig fråga
             const value = this.currentQuestion.data.value;
@@ -771,26 +830,45 @@ class JeopardyGame {
             const playerElement = document.getElementById(`player${this.buzzerWinner + 1}`);
             playerElement.classList.remove('buzzed', 'active');
 
+            // Visa ledset ansikte i 0.2 sekunder
+            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerImageSrc = `images/${playerNames[this.buzzerWinner]}_ledsen.png`;
+            const player = this.players[this.buzzerWinner];
+
+            document.getElementById('questionText').innerHTML = `
+                <div style="text-align: center;">
+                    <img src="${playerImageSrc}" alt="${player.name}"
+                        style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin-bottom: 20px;">
+                    <p style="font-size: 2rem; color: #dc3545;">✗ Fel svar!</p>
+                </div>
+            `;
+
             if (this.buzzerAttempts.length < 4) {
-                this.buzzerWinner = null;
-                this.buzzerActive = true;
-                document.getElementById('buzzerStatus').textContent = '';
+                setTimeout(() => {
+                    this.buzzerWinner = null;
+                    this.buzzerActive = true;
+                    document.getElementById('buzzerStatus').textContent = '';
 
-                // Återställ frågetexten
-                document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
+                    // Återställ frågetexten
+                    document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
 
-                // Starta ny timer
-                const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
-                this.startQuestionTimer(isDeathCategory ? 20 : 10);
+                    // Intro-ljudet fortsätter spela automatiskt, behöver inte göra något
+
+                    // Starta ny timer
+                    const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
+                    this.startQuestionTimer(isDeathCategory ? 20 : 10);
+                }, 200);
             } else {
-                // Alla har försökt och ingen lyckas - spela inget_svar ljud
-                this.playSound('sounds/inget_svar.mp3', 0.5);
+                setTimeout(() => {
+                    // Alla har försökt och ingen lyckas - spela inget_svar ljud
+                    this.playSound('sounds/inget_svar.mp3', 0.5);
 
-                // Alla blir neutrala
-                this.setPlayerFaces(null);
+                    // Alla blir neutrala
+                    this.setPlayerFaces(null);
 
-                this.markQuestionAsAnswered();
-                this.closeQuestionModal();
+                    this.markQuestionAsAnswered();
+                    this.closeQuestionModal();
+                }, 200);
             }
         }
     }
@@ -810,6 +888,9 @@ class JeopardyGame {
             clearTimeout(this.autoCloseTimeout);
             this.autoCloseTimeout = null;
         }
+
+        // Stoppa intro-ljud om det spelar
+        this.stopIntroSound();
 
         document.getElementById('questionModal').classList.add('hidden');
         this.buzzerActive = false;

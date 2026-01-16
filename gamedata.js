@@ -48,7 +48,7 @@ const gameData = {
                 {value: 500, question: "Så kallas den svarta vertikala linje många gravida får över magen.", answer: ""},
             ],
         ],
-        dailyDoubles: ["5-2"]
+        dailyDoubles: ["1-4"]
     },
 
     round2: {
@@ -62,11 +62,11 @@ const gameData = {
                 {value: 1000, question: "Hematom", answer: ""},
             ],
             [
-                {value: 200, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/dancing_queen_abba.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
-                {value: 400, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/i_love_it_icona_pop.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
-                {value: 600, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/under_pressure_queen.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
-                {value: 800, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/bitter_sweet_symphony_the_verve.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
-                {value: 1000, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/seven_nation_army_the_white_stripes.mp3\"><p style=\"font-size: 2.5rem;\">🎵 Lyssna på introt 🎵</p></div>", answer: ""},
+                {value: 200, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/dancing_queen_abba.mp3\"><p style=\"font-size: 8rem;\">🎵</p></div>", answer: ""},
+                {value: 400, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/i_love_it_icona_pop.mp3\"><p style=\"font-size: 8rem;\">🎵</p></div>", answer: ""},
+                {value: 600, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/under_pressure_queen.mp3\"><p style=\"font-size: 8rem;\">🎵</p></div>", answer: ""},
+                {value: 800, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/bitter_sweet_symphony_the_verve.mp3\"><p style=\"font-size: 8rem;\">🎵</p></div>", answer: ""},
+                {value: 1000, question: "<div class=\"intro-question\" data-audio-src=\"sounds/intros/seven_nation_army_the_white_stripes.mp3\"><p style=\"font-size: 8rem;\">🎵</p></div>", answer: ""},
             ],
             [
                 {value: 200, question: "Little Rocket Man.", answer: ""},
@@ -97,7 +97,7 @@ const gameData = {
                 {value: 1000, question: "Det tyska ordet för ett fynd eller en stor succé.", answer: ""},
             ],
         ],
-        dailyDoubles: ["0-2", "4-2"]
+        dailyDoubles: ["0-1", "0-3"]
     },
 
     round3: {
@@ -146,7 +146,7 @@ const gameData = {
                 {value: 1500, question: "Joakims yngsta syster tillika Kalle Ankas mamma.", answer: ""},
             ],
         ],
-        dailyDoubles: ["3-1", "1-3", "3-2"]
+        dailyDoubles: ["4-0", "5-3", "3-4"]
     },
 
     final: {

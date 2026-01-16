@@ -306,10 +306,10 @@ header {
 
 .modal-content {
     background: #060CE9;
-    padding: 60px;
+    padding: 80px;
     border-radius: 15px;
-    max-width: 1100px;
-    width: 90%;
+    max-width: 1400px;
+    width: 95%;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     text-align: center;
 }
@@ -333,7 +333,7 @@ header {
 }
 
 .question-text {
-    font-size: 2.8rem;
+    font-size: 3.5rem;
     margin-bottom: 40px;
     line-height: 1.5;
     min-height: 120px;
@@ -344,8 +344,8 @@ header {
 
 /* Frågebilder - enhetlig storlek */
 .question-image {
-    width: 500px;
-    height: 500px;
+    width: 700px;
+    height: 700px;
     object-fit: contain;
     background: rgba(0, 0, 0, 0.3);
     border: 3px solid #ffd700;
