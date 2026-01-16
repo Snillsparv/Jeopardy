@@ -690,6 +690,9 @@ class JeopardyGame {
             this.players[this.currentOwner].score += wager;
             this.currentOwner = this.currentOwner; // Behåller äganderätten
             winnerIndex = this.currentOwner;
+
+            // Spela applåd för rätt svar på Daily Double
+            this.playSound('sounds/applåd.mp3', 0.7);
         } else if (this.buzzerWinner !== null) {
             // Vanlig fråga
             const value = this.currentQuestion.data.value;
