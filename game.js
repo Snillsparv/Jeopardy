@@ -34,6 +34,7 @@ class JeopardyGame {
         this.revealedCategories = 0; // Hur många ämnen som är avslöjade
         this.categoriesRevealed = false; // Om alla ämnen är avslöjade
         this.valuesRevealed = false; // Om beloppen är avslöjade
+        this.ownerSelected = false; // Om spelägaren har slumpats
 
         // Ljud och video
         this.dailyDoubleCount = 0; // Räkna antal Daily Doubles
@@ -228,11 +229,11 @@ class JeopardyGame {
                 if (this.answeredQuestions[roundKey].includes(questionId)) {
                     questionDiv.classList.add('answered');
                     questionDiv.textContent = '';
-                } else if (this.categoriesRevealed) {
+                } else if (this.categoriesRevealed && this.ownerSelected) {
                     questionDiv.textContent = question.value;
                     questionDiv.onclick = () => this.selectQuestion(col, row, isDailyDouble);
-                } else if (this.valuesRevealed) {
-                    // Visa belopp men inte klickbart förrän kategorier är avslöjade
+                } else if (this.categoriesRevealed || this.valuesRevealed) {
+                    // Visa belopp men inte klickbart förrän kategorier är avslöjade OCH ägare vald
                     questionDiv.textContent = question.value;
                     questionDiv.style.cursor = 'default';
                 } else {
@@ -389,6 +390,50 @@ class JeopardyGame {
                 p.classList.remove('owner');
             }
         });
+    }
+
+    startOwnerRandomization() {
+        const ownerModal = document.getElementById('ownerSelectionModal');
+        const ownerImage = document.getElementById('ownerRandomizerImage');
+        const ownerName = document.getElementById('ownerRandomizerName');
+        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+
+        ownerModal.classList.remove('hidden');
+
+        let currentIndex = 0;
+        let iterations = 0;
+        const maxIterations = 20; // Slumpa 20 gånger
+        const initialDelay = 100; // Börja på 100ms
+
+        const randomize = () => {
+            iterations++;
+            currentIndex = Math.floor(Math.random() * 4);
+
+            // Uppdatera bilden och namnet
+            ownerImage.src = `images/${playerNames[currentIndex]}_neutral.png`;
+            ownerName.textContent = this.players[currentIndex].name;
+
+            if (iterations < maxIterations) {
+                // Öka fördröjningen gradvis för att sakta ner
+                const delay = initialDelay + (iterations * 30);
+                setTimeout(randomize, delay);
+            } else {
+                // Slumpning klar - välj den slutgiltiga ägaren
+                setTimeout(() => {
+                    // Visa glad bild
+                    ownerImage.src = `images/${playerNames[currentIndex]}_glad.png`;
+
+                    setTimeout(() => {
+                        this.currentOwner = currentIndex;
+                        this.ownerSelected = true;
+                        this.updateOwnerDisplay();
+                        ownerModal.classList.add('hidden');
+                    }, 2000); // Visa glad bild i 2 sekunder
+                }, 500);
+            }
+        };
+
+        randomize();
     }
 
     selectQuestion(col, row, isDailyDouble) {
@@ -974,6 +1019,7 @@ class JeopardyGame {
         this.revealedCategories = 0;
         this.categoriesRevealed = false;
         this.valuesRevealed = false;
+        this.ownerSelected = false; // Slumpa ny ägare varje runda
 
         this.renderBoard();
 
@@ -1452,6 +1498,19 @@ class JeopardyGame {
                 finalModal.classList.contains('hidden')) {
                 e.preventDefault();
                 this.revealNextCategory();
+                return;
+            }
+
+            // Ägareslumpning efter kategorierna avslöjats
+            const ownerModal = document.getElementById('ownerSelectionModal');
+            if (e.key === 'PageDown' &&
+                this.categoriesRevealed &&
+                !this.ownerSelected &&
+                modal.classList.contains('hidden') &&
+                finalModal.classList.contains('hidden') &&
+                ownerModal.classList.contains('hidden')) {
+                e.preventDefault();
+                this.startOwnerRandomization();
                 return;
             }
 
