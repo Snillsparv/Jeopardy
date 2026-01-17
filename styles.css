@@ -532,74 +532,16 @@ header {
 }
 
 /* Winner Modal */
-.winner-section {
-    text-align: center;
-    margin: 30px 0;
-    padding: 20px;
-}
-
-.winner-image {
-    width: 350px;
-    height: 350px;
-    object-fit: contain;
-    border-radius: 15px;
-    border: 8px solid #ffd700;
-    box-shadow:
-        0 0 50px rgba(255, 215, 0, 1),
-        0 0 100px rgba(255, 215, 0, 0.6);
-    margin-bottom: 30px;
-    animation: goldGlow 2s ease-in-out infinite;
-    background: rgba(255, 215, 0, 0.05);
-    padding: 10px;
-}
-
-@keyframes goldGlow {
-    0%, 100% {
-        box-shadow:
-            0 0 50px rgba(255, 215, 0, 1),
-            0 0 100px rgba(255, 215, 0, 0.6);
-    }
-    50% {
-        box-shadow:
-            0 0 70px rgba(255, 215, 0, 1),
-            0 0 120px rgba(255, 215, 0, 0.8);
-    }
-}
-
-.winner-name {
-    font-size: 4rem;
-    font-weight: bold;
-    color: #ffd700;
-    margin-bottom: 15px;
-    text-shadow:
-        0 0 20px rgba(255, 215, 0, 1),
-        0 0 40px rgba(255, 215, 0, 0.8),
-        3px 3px 6px rgba(0, 0, 0, 0.8);
-}
-
-.winner-score {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #ffd700;
-    text-shadow:
-        0 0 15px rgba(255, 215, 0, 0.8),
-        2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.losers-section {
-    margin-top: 40px;
-    text-align: center;
-}
-
-.losers-container {
+.all-placements-container {
     display: flex;
     justify-content: center;
     gap: 20px;
     flex-wrap: nowrap;
     max-width: 100%;
+    align-items: flex-end;
 }
 
-.loser-item {
+.placement-item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -610,7 +552,13 @@ header {
     max-width: 280px;
 }
 
-.loser-image {
+.placement-winner {
+    background: rgba(255, 215, 0, 0.15);
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+.placement-image {
     width: 220px;
     height: 220px;
     object-fit: contain;
@@ -621,22 +569,57 @@ header {
     padding: 8px;
 }
 
-.loser-rank {
+.placement-winner .placement-image {
+    width: 280px;
+    height: 280px;
+    border: 6px solid #ffd700;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+    animation: goldGlow 2s ease-in-out infinite;
+}
+
+@keyframes goldGlow {
+    0%, 100% {
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(255, 215, 0, 1);
+    }
+}
+
+.placement-rank {
     font-size: 1.2rem;
     color: #aaa;
     margin-bottom: 10px;
 }
 
-.loser-name {
+.placement-winner .placement-rank {
+    font-size: 1.5rem;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.placement-name {
     font-size: 1.5rem;
     font-weight: bold;
     color: white;
     margin-bottom: 8px;
 }
 
-.loser-score {
+.placement-winner .placement-name {
+    font-size: 2rem;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.placement-score {
     font-size: 1.3rem;
     color: #ccc;
+}
+
+.placement-winner .placement-score {
+    font-size: 1.8rem;
+    color: #ffd700;
+    font-weight: bold;
 }
 
 /* Score Management Modal */

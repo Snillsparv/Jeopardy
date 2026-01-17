@@ -1299,28 +1299,22 @@ class JeopardyGame {
         this.playVideo(`videos/vinnarvideo_${winnerName}.mp4`, () => {
             // När videon är klar, visa vinnarmodalen
 
-            // Visa vinnaren - använd placeringsbilden från images-mappen
-            document.getElementById('winnerImage').src = `images/${winnerName}_1.png`;
-            document.getElementById('winnerName').textContent = winner.name;
-            document.getElementById('winnerScore').textContent = `${winner.score} kr`;
+            // Visa alla placeringar bredvid varandra
+            const placementsContainer = document.getElementById('allPlacementsContainer');
 
-            // Visa förlorarna
-            const losersContainer = document.getElementById('losersContainer');
-            const losers = sortedPlayers.slice(1); // Alla utom vinnaren
-
-            losersContainer.innerHTML = losers.map((player, index) => {
-                const rank = index + 2; // 2:a, 3:e, 4:e
-                const rankText = rank === 2 ? '2:a plats' : rank === 3 ? '3:e plats' : '4:e plats';
+            placementsContainer.innerHTML = sortedPlayers.map((player, index) => {
+                const rank = index + 1; // 1:a, 2:a, 3:e, 4:e
+                const rankText = rank === 1 ? '1:a plats' : rank === 2 ? '2:a plats' : rank === 3 ? '3:e plats' : '4:e plats';
                 const imageName = playerNames[player.index];
-                // Använd placeringsbilderna från images-mappen
                 const imageSrc = `images/${imageName}_${rank}.png`;
+                const isWinner = rank === 1;
 
                 return `
-                    <div class="loser-item">
-                        <div class="loser-rank">${rankText}</div>
-                        <img src="${imageSrc}" alt="${player.name}" class="loser-image">
-                        <div class="loser-name">${player.name}</div>
-                        <div class="loser-score">${player.score} kr</div>
+                    <div class="placement-item ${isWinner ? 'placement-winner' : ''}">
+                        <div class="placement-rank">${rankText}</div>
+                        <img src="${imageSrc}" alt="${player.name}" class="placement-image">
+                        <div class="placement-name">${player.name}</div>
+                        <div class="placement-score">${player.score} kr</div>
                     </div>
                 `;
             }).join('');
@@ -1475,6 +1469,14 @@ class JeopardyGame {
             if (e.key === 'b' || e.key === 'B') {
                 e.preventDefault();
                 this.debugClearBoard();
+                return;
+            }
+
+            // J key - jump to winner screen
+            if (e.key === 'j' || e.key === 'J') {
+                e.preventDefault();
+                finalModal.classList.add('hidden');
+                this.showWinner();
                 return;
             }
 
