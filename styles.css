@@ -587,18 +587,20 @@ header {
 .losers-container {
     display: flex;
     justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
+    gap: 20px;
+    flex-wrap: nowrap;
+    max-width: 100%;
 }
 
 .loser-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
-    min-width: 180px;
+    flex: 1;
+    max-width: 280px;
 }
 
 .loser-image {
@@ -763,21 +765,6 @@ header {
 .final-section {
     text-align: center;
     padding: 20px;
-}
-
-/* Versionsnummer */
-.version-info {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: #ffd700;
-    padding: 5px 12px;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    z-index: 999;
-    font-family: monospace;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 /* Responsiv design */
