@@ -422,6 +422,7 @@ class JeopardyGame {
                     this.currentOwner = currentIndex;
                     this.ownerSelected = true;
                     this.updateOwnerDisplay();
+                    this.renderBoard(); // Uppdatera brädet så frågorna blir klickbara
                 }, 300);
             }
         };
