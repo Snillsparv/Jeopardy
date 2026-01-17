@@ -394,42 +394,42 @@ class JeopardyGame {
 
     startOwnerRandomization() {
         const ownerModal = document.getElementById('ownerSelectionModal');
-        const ownerImage = document.getElementById('ownerRandomizerImage');
-        const ownerName = document.getElementById('ownerRandomizerName');
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerElements = document.querySelectorAll('.player');
 
         ownerModal.classList.remove('hidden');
 
         let currentIndex = 0;
         let iterations = 0;
         const maxIterations = 20; // Slumpa 20 gånger
-        const initialDelay = 100; // Börja på 100ms
+        const initialDelay = 80; // Börja på 80ms
 
         const randomize = () => {
             iterations++;
+
+            // Ta bort owner från alla spelare
+            playerElements.forEach(p => p.classList.remove('owner'));
+
+            // Välj en slumpmässig spelare
             currentIndex = Math.floor(Math.random() * 4);
 
-            // Uppdatera bilden och namnet
-            ownerImage.src = `images/${playerNames[currentIndex]}_neutral.png`;
-            ownerName.textContent = this.players[currentIndex].name;
+            // Lägg till owner på den valda spelaren
+            playerElements[currentIndex].classList.add('owner');
 
             if (iterations < maxIterations) {
                 // Öka fördröjningen gradvis för att sakta ner
-                const delay = initialDelay + (iterations * 30);
+                const delay = initialDelay + (iterations * 25);
                 setTimeout(randomize, delay);
             } else {
-                // Slumpning klar - välj den slutgiltiga ägaren
+                // Slumpning klar - behåll den slutgiltiga ägaren
                 setTimeout(() => {
-                    // Visa glad bild
-                    ownerImage.src = `images/${playerNames[currentIndex]}_glad.png`;
+                    this.currentOwner = currentIndex;
+                    this.ownerSelected = true;
+                    this.updateOwnerDisplay();
 
                     setTimeout(() => {
-                        this.currentOwner = currentIndex;
-                        this.ownerSelected = true;
-                        this.updateOwnerDisplay();
                         ownerModal.classList.add('hidden');
-                    }, 2000); // Visa glad bild i 2 sekunder
-                }, 500);
+                    }, 1500); // Visa vinnaren i 1.5 sekunder
+                }, 300);
             }
         };
 
