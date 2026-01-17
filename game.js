@@ -1135,7 +1135,7 @@ class JeopardyGame {
 
     showFinalAnswer() {
         document.getElementById('finalCorrectionSection').classList.add('hidden');
-        document.getElementById('finalAnswerSection').classList.remove('hidden');
+        // Svaret ska inte visas - bara rättning av spelarna
         document.getElementById('finalRevealSection').classList.remove('hidden');
 
         this.finalCurrentPlayer = 0;

@@ -528,35 +528,12 @@ header {
 .winner-section {
     text-align: center;
     margin: 30px 0;
-    padding: 50px;
-    background: linear-gradient(135deg,
-        rgba(255, 215, 0, 0.3) 0%,
-        rgba(255, 193, 7, 0.4) 50%,
-        rgba(255, 215, 0, 0.3) 100%);
-    border-radius: 20px;
-    border: 5px solid #ffd700;
-    box-shadow:
-        0 0 60px rgba(255, 215, 0, 0.8),
-        inset 0 0 60px rgba(255, 215, 0, 0.2);
-    animation: goldPulse 2s ease-in-out infinite;
-}
-
-@keyframes goldPulse {
-    0%, 100% {
-        box-shadow:
-            0 0 60px rgba(255, 215, 0, 0.8),
-            inset 0 0 60px rgba(255, 215, 0, 0.2);
-    }
-    50% {
-        box-shadow:
-            0 0 80px rgba(255, 215, 0, 1),
-            inset 0 0 80px rgba(255, 215, 0, 0.4);
-    }
+    padding: 20px;
 }
 
 .winner-image {
-    width: 280px;
-    height: 280px;
+    width: 350px;
+    height: 350px;
     object-fit: contain;
     border-radius: 15px;
     border: 8px solid #ffd700;
@@ -625,8 +602,8 @@ header {
 }
 
 .loser-image {
-    width: 180px;
-    height: 180px;
+    width: 220px;
+    height: 220px;
     object-fit: contain;
     margin-bottom: 15px;
     border-radius: 10px;
