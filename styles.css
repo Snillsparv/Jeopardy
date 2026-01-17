@@ -487,13 +487,6 @@ header {
     margin-top: 5px;
 }
 
-/* Owner Selection Modal */
-.owner-selection-content {
-    max-width: 500px !important;
-    padding: 80px 60px !important;
-    text-align: center;
-}
-
 /* Buttons */
 .modal-buttons {
     display: flex;

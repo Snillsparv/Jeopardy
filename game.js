@@ -393,10 +393,7 @@ class JeopardyGame {
     }
 
     startOwnerRandomization() {
-        const ownerModal = document.getElementById('ownerSelectionModal');
         const playerElements = document.querySelectorAll('.player');
-
-        ownerModal.classList.remove('hidden');
 
         let currentIndex = 0;
         let iterations = 0;
@@ -425,10 +422,6 @@ class JeopardyGame {
                     this.currentOwner = currentIndex;
                     this.ownerSelected = true;
                     this.updateOwnerDisplay();
-
-                    setTimeout(() => {
-                        ownerModal.classList.add('hidden');
-                    }, 1500); // Visa vinnaren i 1.5 sekunder
                 }, 300);
             }
         };
@@ -1504,13 +1497,11 @@ class JeopardyGame {
             }
 
             // Ägareslumpning efter kategorierna avslöjats
-            const ownerModal = document.getElementById('ownerSelectionModal');
             if (e.key === 'PageDown' &&
                 this.categoriesRevealed &&
                 !this.ownerSelected &&
                 modal.classList.contains('hidden') &&
-                finalModal.classList.contains('hidden') &&
-                ownerModal.classList.contains('hidden')) {
+                finalModal.classList.contains('hidden')) {
                 e.preventDefault();
                 this.startOwnerRandomization();
                 return;
