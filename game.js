@@ -33,6 +33,9 @@ class JeopardyGame {
     }
 
     init() {
+        // Slumpa vem som äger spelet vid start av första rundan
+        this.currentOwner = Math.floor(Math.random() * 4);
+
         this.renderBoard();
         this.setupEventListeners();
         this.updatePlayerScores();
