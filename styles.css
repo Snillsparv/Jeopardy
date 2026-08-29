@@ -44,6 +44,43 @@ body {
     box-shadow: 0 12px 30px rgba(255, 215, 0, 0.5);
 }
 
+/* QR-panel för telefonanslutning (visas bara i serverläge) */
+.join-panel {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-top: 60px;
+    animation: fadeIn 1s ease-in;
+}
+
+.join-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 12px;
+    padding: 18px 22px;
+    text-align: center;
+}
+
+.join-qr svg {
+    background: white;
+    border-radius: 8px;
+    display: block;
+}
+
+.join-label {
+    margin-top: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.join-url {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: #aaa;
+    font-family: monospace;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

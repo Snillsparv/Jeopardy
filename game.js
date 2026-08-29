@@ -1655,4 +1655,5 @@ class JeopardyGame {
 let game;
 window.addEventListener('DOMContentLoaded', () => {
     game = new JeopardyGame();
+    window.game = game; // exponera för fjärrstyrningsbryggan (remote.js)
 });

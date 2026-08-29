@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#060CE9">
+    <title>Jeopardy – Buzzer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23060CE9'/><text x='50' y='76' font-size='64' text-anchor='middle'>🔔</text></svg>">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #0f0f1e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* Välj spelare */
+        .pick { padding: 24px 16px; }
+        .pick h1 { color: #ffd700; font-size: 1.4rem; text-align: center; margin-bottom: 20px; }
+        .pick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .pick-card {
+            background: #1e3c72;
+            border: 3px solid transparent;
+            border-radius: 16px;
+            padding: 16px 10px;
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .pick-card:active { border-color: #ffd700; }
+        .pick-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        /* Spelläge */
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #141432;
+        }
+        .me { display: flex; align-items: center; gap: 10px; }
+        .me img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+        .me .nm { font-weight: bold; font-size: 1.05rem; }
+        .me .sc { color: #ffd700; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+        .switch { background: none; border: none; color: #667; font-size: 0.8rem; text-decoration: underline; }
+        .conn { font-size: 0.7rem; color: #888; }
+        .conn.ok::before { content: "● "; color: #4cd964; }
+        .conn.bad::before { content: "● "; color: #dc3545; }
+
+        .buzz-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .buzz {
+            width: min(80vw, 55vh);
+            height: min(80vw, 55vh);
+            border-radius: 50%;
+            border: none;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #555;
+            background: #23233a;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            transition: background 0.15s, color 0.15s, transform 0.1s;
+        }
+        .buzz:active { transform: scale(0.96); }
+        .buzz.armed {
+            background: radial-gradient(circle at 35% 30%, #ff8585, #d92332 70%);
+            color: white;
+            box-shadow: 0 0 60px rgba(217, 35, 50, 0.7);
+            animation: throb 1s ease-in-out infinite;
+        }
+        .buzz.won {
+            background: radial-gradient(circle at 35% 30%, #7dffa9, #1d9e4b 70%);
+            color: white;
+            box-shadow: 0 0 60px rgba(40, 200, 90, 0.7);
+        }
+        .buzz.late { background: #3a2330; color: #a86; }
+        @keyframes throb {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        @media (prefers-reduced-motion: reduce) { .buzz.armed { animation: none; } }
+
+        .status {
+            text-align: center;
+            padding: 0 20px 26px;
+            font-size: 1.05rem;
+            color: #9aa;
+            min-height: 50px;
+        }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="pick" id="pickView">
+        <h1>Vem är du?</h1>
+        <div class="pick-grid" id="pickGrid"></div>
+    </div>
+
+    <div id="gameView" hidden style="display: contents;">
+        <div class="top">
+            <div class="me">
+                <img id="meImg" src="" alt="">
+                <div>
+                    <div class="nm" id="meName"></div>
+                    <div class="sc" id="meScore">0 kr</div>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="conn bad" id="conn">ansluter…</div>
+                <button class="switch" id="switchBtn">byt spelare</button>
+            </div>
+        </div>
+        <div class="buzz-area">
+            <button class="buzz" id="buzzBtn" disabled>VÄNTA…</button>
+        </div>
+        <div class="status" id="status">Väntar på att en fråga ska öppnas</div>
+    </div>
+
+    <script>
+    (() => {
+        const NAMES = ['David', 'Ludde', 'Lina', 'Hanna'];
+        const IMAGES = ['david', 'ludde', 'lina', 'hanna'];
+        let me = null;
+        let state = null;
+        let lastMode = '';
+
+        const send = (cmd) => fetch('/action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kind: 'command', ...cmd }),
+        }).catch(() => {});
+
+        // --- Spelarval ------------------------------------------------------
+
+        document.getElementById('pickGrid').innerHTML = NAMES.map((n, i) => `
+            <button class="pick-card" data-i="${i}">
+                <img src="images/${IMAGES[i]}.png" alt="">${n}
+            </button>`).join('');
+
+        function choose(i) {
+            me = i;
+            localStorage.setItem('jeopardyPlayer', String(i));
+            document.getElementById('meImg').src = `images/${IMAGES[i]}.png`;
+            document.getElementById('meName').textContent = NAMES[i];
+            document.getElementById('pickView').hidden = true;
+            document.getElementById('gameView').hidden = false;
+            render();
+        }
+
+        document.querySelectorAll('.pick-card').forEach(el =>
+            el.onclick = () => choose(+el.dataset.i));
+        document.getElementById('switchBtn').onclick = () => {
+            localStorage.removeItem('jeopardyPlayer');
+            me = null;
+            document.getElementById('gameView').hidden = true;
+            document.getElementById('pickView').hidden = false;
+        };
+
+        try {
+            const saved = localStorage.getItem('jeopardyPlayer');
+            if (saved !== null) choose(parseInt(saved, 10));
+        } catch { /* privat läge etc. */ }
+
+        // --- Buzz -----------------------------------------------------------
+
+        const buzzBtn = document.getElementById('buzzBtn');
+        // pointerdown i stället för click: buzzen ska gå iväg direkt vid nedtryck
+        buzzBtn.addEventListener('pointerdown', () => {
+            if (me === null || !state) return;
+            if (state.buzzerActive && !state.buzzerAttempts.includes(me)) {
+                send({ type: 'buzz', player: me });
+            }
+        });
+
+        function render() {
+            if (me === null || !state) return;
+
+            document.getElementById('meScore').textContent = `${state.scores[me]} kr`;
+            const status = document.getElementById('status');
+
+            let mode = 'wait', label = 'VÄNTA…', text = 'Väntar på att en fråga ska öppnas';
+
+            if (state.question && !state.ddAwaitingWager) {
+                if (state.buzzerWinner === me) {
+                    mode = 'won'; label = 'SVARA!'; text = 'Du buzzade först — svara!';
+                } else if (state.buzzerWinner !== null) {
+                    mode = 'late'; label = 'FÖR SENT';
+                    text = `${NAMES[state.buzzerWinner]} hann först`;
+                } else if (state.question.isDailyDouble) {
+                    text = state.owner === me
+                        ? 'Dubbelchans — du svarar själv!'
+                        : `Dubbelchans för ${NAMES[state.owner] ?? '…'}`;
+                } else if (state.buzzerActive && state.buzzerAttempts.includes(me)) {
+                    mode = 'late'; label = 'LÅST';
+                    text = 'Du har redan försökt på den här frågan';
+                } else if (state.buzzerActive) {
+                    mode = 'armed'; label = 'BUZZ!'; text = 'Tryck när du kan svaret!';
+                }
+            } else if (state.winnerOpen) {
+                text = 'Spelet är slut 🎉';
+            } else if (state.finalPhase) {
+                text = 'Final Jeopardy — skriv ditt svar på papper!';
+            }
+
+            buzzBtn.className = `buzz ${mode === 'wait' ? '' : mode}`;
+            buzzBtn.textContent = label;
+            buzzBtn.disabled = mode === 'wait' || mode === 'late';
+            status.textContent = text;
+
+            if (mode !== lastMode) {
+                if (mode === 'armed' && navigator.vibrate) navigator.vibrate(80);
+                if (mode === 'won' && navigator.vibrate) navigator.vibrate([60, 40, 120]);
+                lastMode = mode;
+            }
+        }
+
+        // --- Anslutning -----------------------------------------------------
+
+        const conn = document.getElementById('conn');
+        const source = new EventSource('/events');
+        source.onopen = () => { conn.textContent = 'ansluten'; conn.className = 'conn ok'; };
+        source.onerror = () => { conn.textContent = 'återansluter…'; conn.className = 'conn bad'; };
+        source.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (message.kind === 'state') { state = message.state; render(); }
+            } catch { /* ignorera */ }
+        };
+    })();
+    </script>
+</body>
+</html>

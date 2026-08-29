@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#060CE9">
+    <title>Jeopardy – Programledare</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23060CE9'/><text x='50' y='76' font-size='64' text-anchor='middle'>🎩</text></svg>">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #0f0f1e;
+            color: white;
+            min-height: 100vh;
+            padding: 12px 12px 90px;
+        }
+        header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        h1 { font-size: 1.15rem; color: #ffd700; }
+        .round { font-size: 0.85rem; color: #60d0ff; font-weight: bold; }
+        .conn { font-size: 0.75rem; color: #888; }
+        .conn.ok::before { content: "● "; color: #4cd964; }
+        .conn.bad::before { content: "● "; color: #dc3545; }
+
+        .scores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .score-card {
+            background: #1e3c72;
+            border-radius: 8px;
+            padding: 7px 4px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        .score-card.owner { border-color: #ffd700; }
+        .score-card.buzzed { background: #7a2331; }
+        .score-card .nm { font-size: 0.78rem; font-weight: bold; }
+        .score-card .sc { font-size: 0.85rem; color: #ffd700; font-variant-numeric: tabular-nums; }
+
+        .panel {
+            background: #141432;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .hint { color: #9aa; font-size: 0.95rem; text-align: center; padding: 10px 0; }
+
+        .btn {
+            display: block;
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background: #2130b4;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn.gold { background: #b8860b; }
+        .btn.green { background: #28a745; }
+        .btn.red { background: #dc3545; }
+        .btn:disabled { background: #333; color: #777; }
+        .btn-row { display: flex; gap: 10px; }
+        .btn-row .btn { flex: 1; margin-top: 10px; }
+
+        /* Minibräde */
+        .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+        .cat {
+            background: #2130b4;
+            border-radius: 4px;
+            font-size: 0.55rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 4px 2px;
+            min-height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-wrap: anywhere;
+        }
+        .cell {
+            background: #060CE9;
+            color: #ffd700;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            padding: 12px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .cell:active { background: #0808ff; }
+        .cell.done { background: #1a1a2e; color: #333; }
+
+        /* Facitkort */
+        .facit .cat-name { color: #60d0ff; font-size: 0.8rem; text-transform: uppercase; }
+        .facit .val { color: #ffd700; font-weight: bold; font-size: 1.05rem; margin: 2px 0 8px; }
+        .facit .clue { font-size: 1rem; line-height: 1.45; color: #ddd; }
+        .facit .ans {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(144, 238, 144, 0.12);
+            border-left: 4px solid #90EE90;
+            border-radius: 6px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #90EE90;
+        }
+        .buzzinfo { text-align: center; font-size: 1rem; color: #ffd700; margin-top: 10px; min-height: 22px; }
+
+        input[type=number] {
+            width: 100%;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+            background: #0f0f1e;
+            color: white;
+            margin-top: 10px;
+        }
+
+        /* Poängjustering */
+        .footer {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            padding: 10px 12px;
+            background: rgba(15, 15, 30, 0.95);
+            border-top: 1px solid #2a2a4a;
+        }
+        .footer .btn { margin-top: 0; padding: 10px; font-size: 0.95rem; background: #333356; }
+        .adjust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .adjust-grid label { font-size: 0.85rem; color: #ffd700; font-weight: bold; }
+        .adjust-grid input { margin-top: 4px; font-size: 1.1rem; padding: 8px; }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎩 Programledare</h1>
+        <span class="round" id="round"></span>
+        <span class="conn bad" id="conn">ansluter…</span>
+    </header>
+
+    <div class="scores" id="scores"></div>
+    <div id="content"><p class="hint">Väntar på spelskärmen… starta spelet på datorn (via <code>node server.js</code>).</p></div>
+
+    <div class="footer" id="footer">
+        <button class="btn" id="adjustBtn">⚖️ Justera poäng</button>
+        <div id="adjustPanel" hidden>
+            <div class="adjust-grid" id="adjustGrid"></div>
+            <div class="btn-row">
+                <button class="btn green" id="adjustSave">Spara</button>
+                <button class="btn" id="adjustCancel">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="gamedata.js"></script>
+    <script>
+    (() => {
+        let state = null;
+
+        const send = (cmd) => fetch('/action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kind: 'command', ...cmd }),
+        }).catch(() => {});
+
+        const esc = (s) => String(s).replace(/[&<>"]/g,
+            c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+        // Gör frågetextens HTML läsbar på en liten skärm
+        function clueText(q) {
+            if (q.question.includes('question-image')) return '🖼️ Bildfråga (visas på skärmen)';
+            if (q.question.includes('intro-question')) return '🔊 Ljudfråga (spelas på skärmen)';
+            const symbol = q.question.match(/font-size: 10rem[^>]*>([^<]+)</);
+            if (symbol) return `Tecknet:  ${symbol[1].replace('&amp;', '&')}`;
+            return q.question;
+        }
+
+        function currentQuestionData() {
+            if (!state || !state.question) return null;
+            return gameData[`round${state.round}`].questions[state.question.col][state.question.row];
+        }
+
+        // --- Rendering ------------------------------------------------------
+
+        function renderScores() {
+            document.getElementById('scores').innerHTML = state.names.map((n, i) => `
+                <div class="score-card ${state.owner === i ? 'owner' : ''} ${state.buzzerWinner === i ? 'buzzed' : ''}">
+                    <div class="nm">${state.owner === i ? '👑 ' : ''}${esc(n)}</div>
+                    <div class="sc">${state.scores[i]}</div>
+                </div>`).join('');
+        }
+
+        function facitCard() {
+            const data = currentQuestionData();
+            const q = state.question;
+            return `
+                <div class="panel facit">
+                    <div class="cat-name">${esc(q.category)}</div>
+                    <div class="val">${q.value} kr${q.isDailyDouble ? ' · DUBBELCHANS' + (q.wager ? ` (insats ${q.wager} kr)` : '') : ''}</div>
+                    <div class="clue">${esc(clueText(data))}</div>
+                    <div class="ans">✓ ${esc(data.answer) || '(inget facit)'}</div>
+                </div>`;
+        }
+
+        function miniBoard() {
+            const cats = state.categories.map(c => `<div class="cat">${esc(c)}</div>`).join('');
+            let cells = '';
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 6; col++) {
+                    const value = gameData[`round${state.round}`].questions[col][row].value;
+                    const done = state.answered.includes(`${col}-${row}`);
+                    cells += done
+                        ? `<button class="cell done" disabled></button>`
+                        : `<button class="cell" data-col="${col}" data-row="${row}">${value}</button>`;
+                }
+            }
+            return `<div class="panel"><div class="board">${cats}${cells}</div>
+                <p class="hint">${state.owner !== null ? esc(state.names[state.owner]) + ' väljer — ' : ''}tryck på en ruta för att öppna frågan</p></div>`;
+        }
+
+        function render() {
+            const content = document.getElementById('content');
+            if (!state) return;
+
+            document.getElementById('round').textContent =
+                ['', 'Omgång 1', 'Omgång 2', 'Omgång 3'][state.round] || '';
+            renderScores();
+
+            // Vinnarskärm
+            if (state.winnerOpen) {
+                content.innerHTML = `<div class="panel"><p class="hint">🎉 Spelet är slut!</p>
+                    <button class="btn gold" data-cmd="newgame">Nytt spel</button></div>`;
+                return wire(content);
+            }
+
+            // Final Jeopardy
+            if (state.finalPhase) {
+                content.innerHTML = finalView();
+                return wire(content);
+            }
+
+            // Ställning inför finalen
+            if (state.standingsOpen) {
+                content.innerHTML = `<div class="panel"><p class="hint">Ställningen visas på skärmen</p>
+                    <button class="btn gold" data-key="PageDown">Vidare till priserna 🎁</button></div>`;
+                return wire(content);
+            }
+
+            // Öppen fråga
+            if (state.question) {
+                if (state.ddAwaitingWager) {
+                    const max = state.question.maxWager || 0;
+                    content.innerHTML = `${facitCard()}
+                        <div class="panel">
+                            <p class="hint">${esc(state.names[state.owner] ?? '')} satsar (max ${max} kr)</p>
+                            <input type="number" id="wagerInput" step="100" min="0" max="${max}" value="${Math.min(1000, max)}">
+                            <button class="btn gold" id="wagerBtn">Bekräfta insats</button>
+                        </div>`;
+                    return wire(content);
+                }
+                const canJudge = state.buzzerWinner !== null || state.question.isDailyDouble;
+                const buzzText = state.buzzerWinner !== null
+                    ? `🔔 ${esc(state.names[state.buzzerWinner])} svarar!`
+                    : state.question.isDailyDouble
+                        ? `${esc(state.names[state.owner] ?? '')} svarar (dubbelchans)`
+                        : state.buzzerActive ? 'Väntar på buzz…' : '';
+                content.innerHTML = `${facitCard()}
+                    <div class="buzzinfo">${buzzText}</div>
+                    <div class="btn-row">
+                        <button class="btn green" data-key="PageDown" ${canJudge ? '' : 'disabled'}>✓ RÄTT</button>
+                        <button class="btn red" data-key="PageUp" ${canJudge ? '' : 'disabled'}>✗ FEL</button>
+                    </div>`;
+                return wire(content);
+            }
+
+            // Spelplansfaser
+            if (!state.gameStarted) {
+                content.innerHTML = `<div class="panel"><p class="hint">Allt klart på skärmen?</p>
+                    <button class="btn gold" data-cmd="start">▶ Starta spelet</button></div>`;
+            } else if (!state.valuesRevealed) {
+                content.innerHTML = `<div class="panel"><p class="hint">Beloppen snurrar fram…</p></div>`;
+            } else if (!state.categoriesRevealed) {
+                content.innerHTML = `<div class="panel">
+                    <p class="hint">Kategorier avslöjade: ${state.revealedCategories}/6</p>
+                    <button class="btn gold" data-key="PageDown">Avslöja nästa kategori</button></div>`;
+            } else if (!state.ownerSelected) {
+                content.innerHTML = `<div class="panel"><p class="hint">Alla kategorier avslöjade!</p>
+                    <button class="btn gold" data-key="PageDown">🎲 Slumpa spelägare</button></div>`;
+            } else {
+                content.innerHTML = miniBoard();
+            }
+            wire(content);
+        }
+
+        function finalView() {
+            const p = state.finalPhase;
+            if (p === 'intro') return `<div class="panel"><p class="hint">FINAL!</p>
+                <button class="btn gold" data-key="PageDown">Visa kategorin</button></div>`;
+            if (p === 'categoryReveal') return `<div class="panel">
+                <p class="hint">Kategori: ${esc(gameData.final.category)}</p>
+                <button class="btn gold" data-key="PageDown">Starta satsningarna</button></div>`;
+            if (p === 'wager') {
+                const name = state.names[state.finalPlayer] || '';
+                return `<div class="panel">
+                    <p class="hint">${esc(name)} satsar (max ${state.finalWagerMax} kr)</p>
+                    <input type="number" id="wagerInput" step="100" min="0" max="${state.finalWagerMax}" value="0">
+                    <button class="btn gold" id="wagerBtn">Bekräfta insats</button></div>`;
+            }
+            if (p === 'ready') return `<div class="panel"><p class="hint">Alla har satsat!</p>
+                <button class="btn gold" data-key="PageDown">Visa frågan</button></div>`;
+            if (p === 'question') return `<div class="panel facit">
+                <div class="cat-name">${esc(gameData.final.category)}</div>
+                <div class="clue">${esc(gameData.final.question)}</div>
+                <div class="ans">✓ ${esc(gameData.final.answer)}</div>
+                <p class="hint">🎵 Betänketidsmusiken spelar — rättningen startar när den är klar</p></div>`;
+            if (p === 'correction') return `<div class="panel"><p class="hint">Dags att rätta!</p>
+                <button class="btn gold" data-key="PageDown">Starta rättningen</button></div>`;
+            if (p === 'reveal') {
+                const name = state.names[state.finalPlayer] || '';
+                return `<div class="panel facit">
+                    <div class="ans">✓ ${esc(gameData.final.answer)}</div>
+                    <p class="hint" style="margin-top:8px">Rättar: <b>${esc(name)}</b></p>
+                    <div class="btn-row">
+                        <button class="btn green" data-key="PageDown" ${state.revealButtonsVisible ? '' : 'disabled'}>✓ RÄTT</button>
+                        <button class="btn red" data-key="PageUp" ${state.revealButtonsVisible ? '' : 'disabled'}>✗ FEL</button>
+                    </div></div>`;
+            }
+            return `<div class="panel"><p class="hint">Final pågår…</p></div>`;
+        }
+
+        function wire(root) {
+            root.querySelectorAll('[data-key]').forEach(el =>
+                el.onclick = () => send({ type: 'key', key: el.dataset.key }));
+            root.querySelectorAll('[data-cmd]').forEach(el =>
+                el.onclick = () => send({ type: el.dataset.cmd }));
+            root.querySelectorAll('.cell[data-col]').forEach(el =>
+                el.onclick = () => send({ type: 'select', col: +el.dataset.col, row: +el.dataset.row }));
+            const wagerBtn = root.querySelector('#wagerBtn');
+            if (wagerBtn) wagerBtn.onclick = () => {
+                const amount = parseInt(root.querySelector('#wagerInput').value, 10) || 0;
+                send({ type: 'wager', amount });
+            };
+        }
+
+        // --- Poängjustering -------------------------------------------------
+
+        const adjustPanel = document.getElementById('adjustPanel');
+        document.getElementById('adjustBtn').onclick = () => {
+            if (!state) return;
+            document.getElementById('adjustGrid').innerHTML = state.names.map((n, i) => `
+                <div><label>${esc(n)}</label>
+                <input type="number" step="100" id="adj${i}" value="${state.scores[i]}"></div>`).join('');
+            adjustPanel.hidden = false;
+            document.getElementById('adjustBtn').hidden = true;
+        };
+        const closeAdjust = () => {
+            adjustPanel.hidden = true;
+            document.getElementById('adjustBtn').hidden = false;
+        };
+        document.getElementById('adjustCancel').onclick = closeAdjust;
+        document.getElementById('adjustSave').onclick = () => {
+            const values = [0, 1, 2, 3].map(i =>
+                parseInt(document.getElementById(`adj${i}`).value, 10) || 0);
+            send({ type: 'scores', values });
+            closeAdjust();
+        };
+
+        // --- Anslutning -----------------------------------------------------
+
+        const conn = document.getElementById('conn');
+        const source = new EventSource('/events');
+        source.onopen = () => { conn.textContent = 'ansluten'; conn.className = 'conn ok'; };
+        source.onerror = () => { conn.textContent = 'återansluter…'; conn.className = 'conn bad'; };
+        source.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (message.kind === 'state') { state = message.state; render(); }
+            } catch { /* ignorera */ }
+        };
+    })();
+    </script>
+</body>
+</html>

@@ -15,11 +15,25 @@ Ett klassiskt Jeopardy-spel byggt i HTML, CSS och JavaScript för fyra spelare (
 
 ## Hur man startar spelet
 
-1. Starta en lokal webbserver i mappen, t.ex. `python3 -m http.server 8000`
-2. Öppna `http://localhost:8000` i en webbläsare (helst i helskärm på stor skärm/projektor)
-3. Klicka på **Starta spelet** — jingeln spelas och spelplanen byggs upp
+### Med telefonstyrning (rekommenderas)
 
-Att öppna `index.html` direkt som fil fungerar oftast också, men en lokal server ger pålitligast ljud/video.
+1. Kör `node server.js` i spelmappen (kräver bara [Node.js](https://nodejs.org), inga paket)
+2. Öppna `http://localhost:8080` på datorn/TV:n — det är spelskärmen
+3. Skanna QR-koderna på startskärmen med telefonerna (allt på samma wifi):
+   - **Programledaren** → `/host`: starta spelet, avslöja kategorier, öppna frågor
+     från ett minibräde, se **facit i handen**, rätta med stora RÄTT/FEL-knappar,
+     mata in insatser och justera poäng
+   - **Spelarna** → `/play`: välj vem du är och få en stor buzzerknapp som tänds
+     när frågan är öppen (vibrerar på Android)
+
+Tangentbordet på datorn fungerar parallellt hela tiden, så fysiska buzz-kontroller
+och telefoner kan användas om vartannat.
+
+### Utan server (som tidigare)
+
+Öppna `index.html` direkt eller via valfri webbserver (t.ex.
+`python3 -m http.server 8000`) och styr allt med tangentbordet — fjärrläget är
+helt avstängt då.
 
 ## Spelflöde och kontroller
 
@@ -78,8 +92,17 @@ const gameData = {
 - `styles.css` – all styling (Jeopardy-blått: `#060CE9`)
 - `game.js` – spellogik, buzzer, timers, ljud/video
 - `gamedata.js` – frågedata (genererad)
+- `server.js` – LAN-server för telefonstyrning (beroendefri Node, SSE-buss)
+- `remote.js` – brygga i spelskärmen: rapporterar tillstånd, tar emot kommandon
+  (aktiveras bara när spelet serveras av `server.js`)
+- `host.html` / `play.html` – programledarens fjärr respektive spelarnas buzzer
+- `vendor/qrcode.min.js` – QR-koder på startskärmen ([qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator), MIT)
 - `convert_ny_omgang_to_gamedata.py` / `convert_excel_to_gamedata.py` – konverterare
 - `images/`, `sounds/`, `videos/` – media (videofiler versioneras med Git LFS)
+
+Telefonstyrningen är byggd för ett privat wifi: ingen inloggning, och skärmen är
+alltid auktoritativ — telefonerna skickar bara kommandon (motsvarande
+tangenttryck) och ritar sitt UI från skärmens tillståndsrapporter.
 
 ## Anpassningar
 
