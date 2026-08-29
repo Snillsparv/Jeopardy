@@ -83,6 +83,10 @@
             standingsOpen: !isHidden('standingsModal'),
             winnerOpen: !isHidden('winnerModal'),
             prizeOpen: !isHidden('prizeModal'),
+            statsOpen: !isHidden('statsModal'),
+            statsTitle: (g.statsIndex !== null && g.statSlides[g.statsIndex])
+                ? g.statSlides[g.statsIndex].title : '',
+            statsLast: g.statsIndex !== null && g.statsIndex === g.statSlides.length - 1,
             prizeText: (g.prizeIndex !== null && typeof PRIZES !== 'undefined')
                 ? `${PRIZES[g.prizeIndex].rank ? PRIZES[g.prizeIndex].rank + ': ' : ''}${PRIZES[g.prizeIndex].title}`
                 : '',

@@ -68,6 +68,18 @@ class JeopardyGame {
         this.finalCurrentPlayer = 0;
         this.prizeIndex = null; // aktivt prisuppslag (null = prisvisning stängd)
 
+        // Statistik som samlas under spelets gång
+        this.stats = {
+            players: this.players.map(() => ({
+                correct: 0, wrong: 0, buzzes: 0, responseTimes: [],
+            })),
+            unanswered: 0,
+        };
+        this.buzzOpenedAt = null;      // tidsstämpel när buzzen senast öppnades
+        this.buzzTimingCounts = true;  // false för ljud-direkt (responstid mäts ej)
+        this.statsIndex = null;        // aktiv statistikbild (null = stängd)
+        this.statSlides = [];
+
         // Ämnesavslöjning
         this.revealedCategories = 0; // Hur många ämnen som är avslöjade
         this.categoriesRevealed = false; // Om alla ämnen är avslöjade
@@ -782,6 +794,8 @@ class JeopardyGame {
         this.buzzAwaitingRead = false;
         this.activateBuzzer();
         this.updateBuzzFrame();
+        this.buzzOpenedAt = performance.now();
+        this.buzzTimingCounts = true;
         this.startQuestionTimer(10);
     }
 
@@ -828,6 +842,8 @@ class JeopardyGame {
                 this.buzzAwaitingRead = false;
                 this.activateBuzzer();
                 this.updateBuzzFrame();
+                this.buzzOpenedAt = performance.now();
+                this.buzzTimingCounts = false; // mid-klipp-buzz är inte responstid
             } else {
                 this.buzzAwaitingRead = true;
             }
@@ -872,6 +888,7 @@ class JeopardyGame {
                     this.stopIntroSound();
 
                     // Ingen lyckas svara - spela inget_svar ljud
+                    this.stats.unanswered++;
                     this.playSound('sounds/inget_svar.mp3', 0.5);
 
                     // Alla blir neutrala
@@ -973,6 +990,13 @@ class JeopardyGame {
             this.buzzerWinner = playerIndex;
             this.buzzerActive = false;
 
+            // Statistik: buzzvinst + responstid (ej för ljud-direkt-frågor)
+            const playerStats = this.stats.players[playerIndex];
+            playerStats.buzzes++;
+            if (this.buzzTimingCounts && this.buzzOpenedAt !== null) {
+                playerStats.responseTimes.push(performance.now() - this.buzzOpenedAt);
+            }
+
             this.updateBuzzFrame();
 
             // Pausa intro-ljud om det spelar
@@ -1019,6 +1043,7 @@ class JeopardyGame {
             const wager = this.currentQuestion.wager || this.currentQuestion.data.value;
             this.players[this.currentOwner].score += wager;
             winnerIndex = this.currentOwner; // Ägaren behåller äganderätten
+            this.stats.players[this.currentOwner].correct++;
 
             // Spela applåd för rätt svar på Daily Double
             this.playSound('sounds/applåd.mp3', 0.7);
@@ -1028,6 +1053,7 @@ class JeopardyGame {
             this.players[this.buzzerWinner].score += value;
             this.currentOwner = this.buzzerWinner; // Ny ägare!
             winnerIndex = this.buzzerWinner;
+            this.stats.players[this.buzzerWinner].correct++;
 
             this.playSound('sounds/rätt_svar.wav', 0.5);
         }
@@ -1068,6 +1094,7 @@ class JeopardyGame {
             // Daily Double - förlora insatsen
             const wager = this.currentQuestion.wager || this.currentQuestion.data.value;
             this.players[this.currentOwner].score -= wager;
+            this.stats.players[this.currentOwner].wrong++;
             this.updatePlayerScores();
 
             // Visa ledset ansikte i 0.4 sekunder
@@ -1093,6 +1120,7 @@ class JeopardyGame {
             // Vanlig fråga
             const value = this.currentQuestion.data.value;
             this.players[this.buzzerWinner].score -= value;
+            this.stats.players[this.buzzerWinner].wrong++;
             this.updatePlayerScores();
 
             const playerElement = document.getElementById(`player${this.buzzerWinner + 1}`);
@@ -1116,6 +1144,7 @@ class JeopardyGame {
                     this.buzzerWinner = null;
                     this.buzzerActive = true;
                     this.updateBuzzFrame();
+                    this.buzzOpenedAt = performance.now();
                     document.getElementById('buzzerStatus').textContent = '';
 
                     // Återställ frågetexten
@@ -1135,6 +1164,7 @@ class JeopardyGame {
             } else {
                 setTimeout(() => {
                     // Alla har försökt och ingen lyckas - spela inget_svar ljud
+                    this.stats.unanswered++;
                     this.playSound('sounds/inget_svar.mp3', 0.5);
 
                     // Alla blir neutrala
@@ -1316,6 +1346,138 @@ class JeopardyGame {
         }
     }
 
+    // --- Statistik efter spelet ---------------------------------------------
+    // Visas som bilder, en kategori i taget, bläddring med PageDown.
+
+    buildStatSlides() {
+        const stats = this.stats.players;
+        const names = this.players.map(p => p.name);
+        const seconds = ms => (ms / 1000).toFixed(2).replace('.', ',') + ' s';
+        const average = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+
+        // Bygger radlista sorterad bäst-först; frac styr stapelbredden (0..1)
+        const ranked = (values, { display, lowerIsBetter = false }) => {
+            const rows = values.map((value, i) => ({ i, value }))
+                .sort((a, b) => {
+                    if (a.value === null) return 1;
+                    if (b.value === null) return -1;
+                    return lowerIsBetter ? a.value - b.value : b.value - a.value;
+                });
+            const valid = rows.filter(r => r.value !== null).map(r => r.value);
+            const best = valid.length ? (lowerIsBetter ? Math.min(...valid) : Math.max(...valid)) : 0;
+            return rows.map(r => ({
+                playerIndex: r.i,
+                name: names[r.i],
+                display: r.value === null ? '–' : display(r.value),
+                frac: r.value === null || best === 0
+                    ? 0
+                    : (lowerIsBetter ? best / r.value : r.value / best),
+                isBest: r.value !== null && r.value === best && (lowerIsBetter || best > 0),
+            }));
+        };
+
+        const avgTimes = stats.map(s => average(s.responseTimes));
+        let fastest = null;
+        stats.forEach((s, i) => s.responseTimes.forEach(t => {
+            if (!fastest || t < fastest.t) fastest = { i, t };
+        }));
+
+        const slides = [
+            { eyebrow: '', title: '📊 Kvällens statistik', sub: 'Dags att granska insatserna…' },
+            {
+                eyebrow: 'Flitigast på knappen', title: '🔔 Flest buzz',
+                rows: ranked(stats.map(s => s.buzzes), { display: v => `${v} st` }),
+                sub: 'antal gånger först på buzzern',
+            },
+            {
+                eyebrow: 'Snabbaste fingrarna', title: '⚡ Snittresponstid',
+                rows: ranked(avgTimes, { display: seconds, lowerIsBetter: true }),
+                sub: fastest
+                    ? `Kvällens snabbaste tryck: ${names[fastest.i]}, ${seconds(fastest.t)} · dödsrunorna räknas inte`
+                    : 'dödsrunorna räknas inte',
+            },
+            {
+                eyebrow: 'Träffsäkrast', title: '🎯 Andel rätt',
+                rows: ranked(
+                    stats.map(s => (s.correct + s.wrong) ? s.correct / (s.correct + s.wrong) : null),
+                    { display: v => `${Math.round(v * 100)} %` },
+                ).map(row => ({
+                    ...row,
+                    display: row.display === '–' ? '–'
+                        : `${row.display} (${stats[row.playerIndex].correct} av ${stats[row.playerIndex].correct + stats[row.playerIndex].wrong})`,
+                })),
+                sub: 'andel rätt av alla avgivna svar',
+            },
+            {
+                eyebrow: 'Rättvisan har talat', title: '✅ Flest rätta svar',
+                rows: ranked(stats.map(s => s.correct), { display: v => `${v} st` }),
+            },
+            {
+                eyebrow: 'Vi dömer ingen', title: '🙈 Flest fel svar',
+                rows: ranked(stats.map(s => s.wrong), { display: v => `${v} st` }),
+            },
+            {
+                eyebrow: 'För svårt?', title: '🕳️ Obesvarade frågor',
+                bigNumber: String(this.stats.unanswered),
+                sub: this.stats.unanswered === 1
+                    ? 'fråga gick hela laget förbi'
+                    : 'frågor gick hela laget förbi',
+            },
+            { eyebrow: '', title: 'Tack för i kväll! 🎩', sub: 'Väl kämpat, allihop!' },
+        ];
+        return slides;
+    }
+
+    openStats() {
+        this.statSlides = this.buildStatSlides();
+        this.statsIndex = 0;
+        this.renderStatSlide();
+        document.getElementById('statsModal').classList.remove('hidden');
+    }
+
+    renderStatSlide() {
+        const slide = this.statSlides[this.statsIndex];
+        document.getElementById('statsEyebrow').textContent = slide.eyebrow || '';
+        document.getElementById('statsTitle').textContent = slide.title;
+        document.getElementById('statsSub').textContent = slide.sub || '';
+
+        const body = document.getElementById('statsBody');
+        if (slide.bigNumber !== undefined) {
+            body.innerHTML = `<div class="stats-big">${slide.bigNumber}</div>`;
+        } else if (slide.rows) {
+            body.innerHTML = `<div class="stats-rows">${slide.rows.map(row => `
+                <div class="stat-row ${row.isBest ? 'leader' : ''}">
+                    <img src="images/${PLAYER_IMAGES[row.playerIndex]}.png" alt="">
+                    <div class="stat-name">${row.isBest ? '👑 ' : ''}${row.name}</div>
+                    <div class="stat-bar-track"><div class="stat-bar" data-frac="${row.frac}"></div></div>
+                    <div class="stat-value">${row.display}</div>
+                </div>`).join('')}</div>`;
+
+            // Animera in staplarna
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                body.querySelectorAll('.stat-bar').forEach(bar => {
+                    bar.style.width = `${Math.max(2, bar.dataset.frac * 100)}%`;
+                });
+            }));
+        } else {
+            body.innerHTML = '';
+        }
+    }
+
+    advanceStats() {
+        this.statsIndex++;
+        if (this.statsIndex >= this.statSlides.length) {
+            this.closeStats();
+        } else {
+            this.renderStatSlide();
+        }
+    }
+
+    closeStats() {
+        this.statsIndex = null;
+        document.getElementById('statsModal').classList.add('hidden');
+    }
+
     startFinalJeopardy() {
         // Filtrera ut spelare med negativa poäng
         const eligiblePlayers = this.players.filter(p => p.score > 0);
@@ -1457,6 +1619,7 @@ class JeopardyGame {
 
     finalAnswerCorrect() {
         this.playSound('sounds/applåd.mp3', 0.7);
+        this.stats.players[this.finalCurrentPlayer].correct++;
         const wager = this.finalWagers[this.finalCurrentPlayer];
         this.players[this.finalCurrentPlayer].score += wager;
         const newScore = this.players[this.finalCurrentPlayer].score;
@@ -1487,6 +1650,7 @@ class JeopardyGame {
 
     finalAnswerWrong() {
         this.playSound('sounds/fel_svar.wav', 0.5);
+        this.stats.players[this.finalCurrentPlayer].wrong++;
         const wager = this.finalWagers[this.finalCurrentPlayer];
         this.players[this.finalCurrentPlayer].score -= wager;
         const newScore = this.players[this.finalCurrentPlayer].score;
@@ -1757,6 +1921,29 @@ class JeopardyGame {
                 return;
             }
 
+            // Statistikbläddring (över vinnarskärmen)
+            const statsModal = document.getElementById('statsModal');
+            if (!statsModal.classList.contains('hidden')) {
+                if (e.key === 'PageDown') {
+                    e.preventDefault();
+                    this.advanceStats();
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    this.closeStats();
+                    return;
+                }
+            }
+
+            // Vinnarskärmen: PageDown öppnar statistiken
+            const winnerModal = document.getElementById('winnerModal');
+            if (!winnerModal.classList.contains('hidden') && e.key === 'PageDown') {
+                e.preventDefault();
+                this.openStats();
+                return;
+            }
+
             // Högerpil för kategoriavslöjning (när ingen modal är öppen och belopp är avslöjade)
             if (e.key === 'PageDown' &&
                 this.valuesRevealed &&
@@ -1927,10 +2114,12 @@ class JeopardyGame {
 
         // Other buttons
         const newGameBtn = document.getElementById('newGameBtn');
+        const statsBtn = document.getElementById('statsBtn');
         const applyScoresBtn = document.getElementById('applyScoresBtn');
         const cancelScoresBtn = document.getElementById('cancelScoresBtn');
 
         if (newGameBtn) newGameBtn.onclick = () => this.newGame();
+        if (statsBtn) statsBtn.onclick = () => this.openStats();
         if (applyScoresBtn) applyScoresBtn.onclick = () => this.applyScoreChanges();
         if (cancelScoresBtn) cancelScoresBtn.onclick = () => this.cancelScoreChanges();
     }

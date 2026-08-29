@@ -183,7 +183,20 @@
                 <!-- Alla placeringar -->
                 <div id="allPlacementsContainer" class="all-placements-container"></div>
 
-                <button id="newGameBtn" class="btn" style="margin-top: 30px; font-size: 1.3rem; padding: 15px 40px;">Nytt spel</button>
+                <div class="modal-buttons" style="margin-top: 30px;">
+                    <button id="statsBtn" class="btn btn-correct" style="font-size: 1.3rem; padding: 15px 40px;">📊 Kvällens statistik</button>
+                    <button id="newGameBtn" class="btn" style="font-size: 1.3rem; padding: 15px 40px;">Nytt spel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistik efter spelet -->
+        <div id="statsModal" class="modal hidden">
+            <div class="modal-content stats-content">
+                <p class="stats-eyebrow" id="statsEyebrow"></p>
+                <h2 class="stats-title" id="statsTitle"></h2>
+                <div class="stats-body" id="statsBody"></div>
+                <p class="stats-sub" id="statsSub"></p>
             </div>
         </div>
 

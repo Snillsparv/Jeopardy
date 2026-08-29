@@ -71,6 +71,11 @@ spelägaren ensam efter att ha valt insats.
 Efter omgång 3 visas ställningen, sedan **priserna** som bilder ett i taget
 (PageDown bläddrar; förstapriset förblir hemligt), och därefter startar finalen.
 
+På vinnarskärmen öppnar **📊 Kvällens statistik** (knappen eller PageDown) ett
+bildspel som visas sak för sak: flest buzz, snittresponstid (med kvällens
+snabbaste tryck; dödsrunorna räknas inte), träffsäkerhet, flest rätt/fel och
+antal obesvarade frågor. Statistiken samlas automatiskt under spelets gång.
+
 I `/host`-läget finns motsvarande **🔔 Öppna för buzz**-knapp, och under **🧪 Test**
 finns knappar för att rensa spelplanen (hoppa till nästa omgång) och gå direkt
 till vinnarskärmen.

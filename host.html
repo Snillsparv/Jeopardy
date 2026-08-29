@@ -253,10 +253,19 @@
                 ['', 'Omgång 1', 'Omgång 2', 'Omgång 3'][state.round] || '';
             renderScores();
 
+            // Statistikbläddring (ligger ovanpå vinnarskärmen)
+            if (state.statsOpen) {
+                content.innerHTML = `<div class="panel">
+                    <p class="hint">${esc(state.statsTitle)}</p>
+                    <button class="btn gold" data-key="PageDown">${state.statsLast ? 'Stäng statistiken' : 'Nästa 📊'}</button></div>`;
+                return wire(content);
+            }
+
             // Vinnarskärm
             if (state.winnerOpen) {
                 content.innerHTML = `<div class="panel"><p class="hint">🎉 Spelet är slut!</p>
-                    <button class="btn gold" data-cmd="newgame">Nytt spel</button></div>`;
+                    <button class="btn gold" data-key="PageDown">📊 Kvällens statistik</button>
+                    <button class="btn" data-cmd="newgame">Nytt spel</button></div>`;
                 return wire(content);
             }
 

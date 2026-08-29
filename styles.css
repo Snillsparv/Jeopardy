@@ -578,6 +578,107 @@ header {
     text-align: center;
 }
 
+/* Statistik efter spelet */
+.stats-content {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    gap: 24px;
+    align-items: center;
+}
+
+.stats-eyebrow {
+    font-size: 1.2rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #9db4d8;
+    min-height: 1.2rem;
+}
+
+.stats-title {
+    font-size: 3.4rem;
+    color: #ffd700;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    text-align: center;
+}
+
+.stats-sub {
+    font-size: 1.3rem;
+    color: #b9c6de;
+    text-align: center;
+    min-height: 1.3rem;
+}
+
+.stats-body {
+    width: 100%;
+}
+
+.stats-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: min(1000px, 90%);
+    margin: 10px auto 0;
+}
+
+.stat-row {
+    display: grid;
+    grid-template-columns: 64px 170px 1fr 240px;
+    align-items: center;
+    gap: 18px;
+}
+
+.stat-row img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.stat-row.leader img {
+    box-shadow: 0 0 0 3px #ffd700, 0 0 18px rgba(255, 215, 0, 0.6);
+}
+
+.stat-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.stat-bar-track {
+    height: 16px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.stat-bar {
+    height: 100%;
+    width: 0;
+    background: #ffd700;
+    border-radius: 4px;
+    transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stat-value {
+    font-size: 1.35rem;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: white;
+    white-space: nowrap;
+}
+
+.stats-big {
+    font-size: 10rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+    line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stat-bar { transition: none; }
+}
+
 /* Standings */
 .standings-content {
     padding: 50px 60px !important;
