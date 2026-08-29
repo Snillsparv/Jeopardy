@@ -101,7 +101,7 @@ const gameData = {
     },
 
     round3: {
-        categories: ["Kända matematiker", "Land efter yta", "Spårvagnar", "Avsluta ordvitsen", "Två av oss", "Om programledaren"],
+        categories: ["Kända matematiker", "Land efter yta", "Spårvagnar", "Avsluta ordvitsen", "Två av oss", "Vem har dött?"],
         questions: [
             [
                 {value: 300, question: "Skrek \"Heureka!\" i badkaret i Syrakusa", answer: "Arkimedes"},
@@ -139,11 +139,11 @@ const gameData = {
                 {value: 1500, question: "<img src=\"images/questions/jonas_och_ludde.jpg\" alt=\"Bildfråga\" class=\"question-image\">", answer: "Jonas och Ludde"},
             ],
             [
-                {value: 300, question: "Djuret Jonas oftast förknippas med, vilket även är hans smeknamn", answer: "sparven"},
-                {value: 600, question: "Namnen på Jonas bröder", answer: "Jakob och Hannes"},
-                {value: 900, question: "Det Jonas vunnit VM i förutom minne", answer: "Legorobotprogrammering"},
-                {value: 1200, question: "Jonas favoritfärg", answer: "röd"},
-                {value: 1500, question: "Så många år har Jonas i oktober varit ihop med Jessica", answer: "18"},
+                {value: 300, question: "<div class=\"intro-question\" data-audio-src=\"sounds/questions/pippi_langstrump.mp3\" data-buzz-direct=\"true\"><p style=\"font-size: 8rem;\">🔊</p></div>", answer: "Pippi Långstrump"},
+                {value: 600, question: "<div class=\"intro-question\" data-audio-src=\"sounds/questions/jocke_lundell.mp3\" data-buzz-direct=\"true\"><p style=\"font-size: 8rem;\">🔊</p></div>", answer: "Jocke Lundell"},
+                {value: 900, question: "<div class=\"intro-question\" data-audio-src=\"sounds/questions/carl_von_linne.mp3\" data-buzz-direct=\"true\"><p style=\"font-size: 8rem;\">🔊</p></div>", answer: "Carl von Linné"},
+                {value: 1200, question: "<div class=\"intro-question\" data-audio-src=\"sounds/questions/mahatma_gandhi.mp3\" data-buzz-direct=\"true\"><p style=\"font-size: 8rem;\">🔊</p></div>", answer: "Mahatma Gandhi"},
+                {value: 1500, question: "<div class=\"intro-question\" data-audio-src=\"sounds/questions/justin_bieber.mp3\" data-buzz-direct=\"true\"><p style=\"font-size: 8rem;\">🔊</p></div>", answer: "Justin Bieber"},
             ],
         ],
         dailyDoubles: ["1-1", "0-2", "4-4"]

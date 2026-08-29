@@ -3,6 +3,15 @@
 // Spelarnas bildnamn i images/ — samma ordning som spelarlistan
 const PLAYER_IMAGES = ['david', 'ludde', 'lina', 'hanna'];
 
+// Priserna som presenteras inför finalen, i visningsordning (PageDown bläddrar)
+const PRIZES = [
+    { rank: '', title: '🎁 Priserna!', sub: 'Dags att se vad ni spelar om…', image: null },
+    { rank: '4:e pris', title: 'En SUVERÄN studsboll!', sub: '', image: 'images/priser/plats_4.png' },
+    { rank: '3:e pris', title: 'OTROLIGA såpbubblor!', sub: '', image: 'images/priser/plats_3.png' },
+    { rank: '2:a pris', title: 'En FENOMENAL penna med apelsindoft!', sub: '', image: 'images/priser/plats_2.png' },
+    { rank: '1:a pris', title: 'Något ÄNNU mer storslaget…', sub: 'Avslöjas efter avslutad tävling! 🤫', image: null },
+];
+
 // Standardtangenter för buzzers; kan skrivas över via "Ställ in buzzers"
 const DEFAULT_BUZZER_KEYS = ['1', '2', '3', '4'];
 
@@ -50,7 +59,6 @@ class JeopardyGame {
         this.buzzerAttempts = [];
         this.autoCloseTimeout = null;
         this.answerShown = false;
-        this.showingDeathCategoryAnswer = false; // För att kunna stänga med PageDown
         this.currentOwner = null; // Vem som senast svarade rätt (äger spelet)
         this.timerInterval = null; // För grafisk timer
         this.timeRemaining = 0; // För grafisk display
@@ -58,6 +66,7 @@ class JeopardyGame {
         // Final Jeopardy state
         this.finalWagers = [0, 0, 0, 0];
         this.finalCurrentPlayer = 0;
+        this.prizeIndex = null; // aktivt prisuppslag (null = prisvisning stängd)
 
         // Ämnesavslöjning
         this.revealedCategories = 0; // Hur många ämnen som är avslöjade
@@ -807,16 +816,36 @@ class JeopardyGame {
         const kind = this.questionKind();
 
         if (kind === 'audio') {
-            this.buzzAwaitingRead = true;
+            const introEl = document.querySelector('#questionText .intro-question');
+            const buzzDirect = !!(introEl && introEl.dataset.buzzDirect);
+
             this.startQuestionAudio();
             const clip = this.introAudio;
-            const armIfStillWaiting = () => {
-                if (this.buzzAwaitingRead && this.currentQuestion) this.armBuzzers();
+
+            if (buzzDirect) {
+                // Långa klipp (t.ex. dödsrunorna): fritt att buzza direkt,
+                // men ingen stängningstimer förrän klippet spelats klart
+                this.buzzAwaitingRead = false;
+                this.activateBuzzer();
+                this.updateBuzzFrame();
+            } else {
+                this.buzzAwaitingRead = true;
+            }
+
+            const onClipDone = () => {
+                if (!this.currentQuestion || this.answerShown) return;
+                if (this.buzzAwaitingRead) {
+                    // Vanlig ljudfråga: öppna buzz nu (startar även timern)
+                    this.armBuzzers();
+                } else if (this.buzzerActive && this.buzzerWinner === null) {
+                    // Klipp klart med öppen buzz: nu börjar 10 sekunder ticka
+                    this.startQuestionTimer(10);
+                }
             };
             if (clip) {
-                clip.addEventListener('ended', armIfStillWaiting);
-                clip.addEventListener('error', armIfStillWaiting);
-            } else {
+                clip.addEventListener('ended', onClipDone);
+                clip.addEventListener('error', onClipDone);
+            } else if (!buzzDirect) {
                 this.armBuzzers();
             }
         } else if (kind === 'image' || kind === 'symbol') {
@@ -1023,34 +1052,12 @@ class JeopardyGame {
             `;
         }
 
-        // För "Vem har dött" kategorin, visa frågan i 10 sekunder extra
-        const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
-        if (isDeathCategory) {
-            // Vänta 400ms för att visa glatt ansikte, sedan visa frågan
-            setTimeout(() => {
-                document.getElementById('questionText').innerHTML = this.currentQuestion.data.question;
-                document.getElementById('buzzerStatus').textContent = '✓ Rätt svar!';
-
-                // Uppdatera ansikten permanent
-                this.setPlayerFaces(winnerIndex);
-
-                // Sätt flagga för att kunna stänga med PageDown
-                this.showingDeathCategoryAnswer = true;
-
-                // Vänta 10 sekunder innan modalen stängs
-                this.autoCloseTimeout = setTimeout(() => {
-                    this.showingDeathCategoryAnswer = false;
-                    this.closeQuestionModal();
-                }, 10000);
-            }, 400);
-        } else {
-            // Vänta 400ms för att visa glatt ansikte, sedan stäng
-            setTimeout(() => {
-                // Uppdatera ansikten permanent
-                this.setPlayerFaces(winnerIndex);
-                this.closeQuestionModal();
-            }, 400);
-        }
+        // Vänta 400ms för att visa glatt ansikte, sedan stäng
+        setTimeout(() => {
+            // Uppdatera ansikten permanent
+            this.setPlayerFaces(winnerIndex);
+            this.closeQuestionModal();
+        }, 400);
     }
 
     answerWrong() {
@@ -1119,8 +1126,11 @@ class JeopardyGame {
                         this.introAudio.play().catch(() => {});
                     }
 
-                    // Starta ny timer
-                    this.startQuestionTimer(10);
+                    // Starta ny timer — men inte medan ett ljudklipp spelar;
+                    // då tar klippets ended-lyssnare över när det är klart
+                    if (!(this.introAudio && !this.introAudio.paused && !this.introAudio.ended)) {
+                        this.startQuestionTimer(10);
+                    }
                 }, 400);
             } else {
                 setTimeout(() => {
@@ -1161,7 +1171,6 @@ class JeopardyGame {
         this.buzzerWinner = null;
         this.currentQuestion = null;
         this.answerShown = false;
-        this.showingDeathCategoryAnswer = false;
         this.buzzAwaitingRead = false;
         this.updateBuzzFrame();
 
@@ -1219,11 +1228,11 @@ class JeopardyGame {
         document.getElementById('roundIndicator').textContent =
             `Omgång ${this.currentRound}: ${roundNames[this.currentRound]}`;
 
-        // Återställ kategori- och beloppsavslöjning för nya omgången
+        // Återställ kategori- och beloppsavslöjning för nya omgången.
+        // Spelägaren behålls från förra omgången — slumpas bara i omgång 1.
         this.revealedCategories = 0;
         this.categoriesRevealed = false;
         this.valuesRevealed = false;
-        this.ownerSelected = false; // Slumpa ny ägare varje runda
 
         this.renderBoard();
 
@@ -1273,13 +1282,38 @@ class JeopardyGame {
     }
 
     proceedToPriserna() {
-        // Dölj ställningsmodal
+        // Dölj ställningsmodal och presentera priserna ett i taget
         document.getElementById('standingsModal').classList.add('hidden');
+        this.playSound('sounds/ämnen_visas.mp3', 0.5);
+        this.prizeIndex = 0;
+        this.showPrize();
+        document.getElementById('prizeModal').classList.remove('hidden');
+    }
 
-        // Visa priserna-video och sedan starta Final Jeopardy
-        this.playVideo('sounds/priserna.mp4', () => {
+    showPrize() {
+        const prize = PRIZES[this.prizeIndex];
+        document.getElementById('prizeRank').textContent = prize.rank;
+        document.getElementById('prizeTitle').textContent = prize.title;
+        document.getElementById('prizeSub').textContent = prize.sub;
+        const img = document.getElementById('prizeImage');
+        if (prize.image) {
+            img.src = prize.image;
+            img.hidden = false;
+        } else {
+            img.hidden = true;
+            img.removeAttribute('src');
+        }
+    }
+
+    nextPrize() {
+        this.prizeIndex++;
+        if (this.prizeIndex >= PRIZES.length) {
+            this.prizeIndex = null;
+            document.getElementById('prizeModal').classList.add('hidden');
             this.startFinalJeopardy();
-        });
+        } else {
+            this.showPrize();
+        }
     }
 
     startFinalJeopardy() {
@@ -1715,6 +1749,14 @@ class JeopardyGame {
                 return;
             }
 
+            // Prisvisning - bläddra till nästa pris (sista steget öppnar finalen)
+            const prizeModal = document.getElementById('prizeModal');
+            if (!prizeModal.classList.contains('hidden') && e.key === 'PageDown') {
+                e.preventDefault();
+                this.nextPrize();
+                return;
+            }
+
             // Högerpil för kategoriavslöjning (när ingen modal är öppen och belopp är avslöjade)
             if (e.key === 'PageDown' &&
                 this.valuesRevealed &&
@@ -1852,18 +1894,6 @@ class JeopardyGame {
 
             // Vanlig frågemodal eller Daily Double-fråga
             if (!modal.classList.contains('hidden')) {
-                // PageDown för att stänga dödskateg orifråga när den visas efter rätt svar
-                if (e.key === 'PageDown' && this.showingDeathCategoryAnswer) {
-                    e.preventDefault();
-                    if (this.autoCloseTimeout) {
-                        clearTimeout(this.autoCloseTimeout);
-                        this.autoCloseTimeout = null;
-                    }
-                    this.showingDeathCategoryAnswer = false;
-                    this.closeQuestionModal();
-                    return;
-                }
-
                 // PageDown öppnar buzzrarna när värden läst klart frågan
                 if (e.key === 'PageDown' && this.buzzAwaitingRead &&
                     this.currentQuestion && !this.currentQuestion.isDailyDouble) {

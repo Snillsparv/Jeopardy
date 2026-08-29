@@ -82,6 +82,11 @@
             revealButtonsVisible: !isHidden('revealCorrectBtn') && finalPhase() === 'reveal',
             standingsOpen: !isHidden('standingsModal'),
             winnerOpen: !isHidden('winnerModal'),
+            prizeOpen: !isHidden('prizeModal'),
+            prizeText: (g.prizeIndex !== null && typeof PRIZES !== 'undefined')
+                ? `${PRIZES[g.prizeIndex].rank ? PRIZES[g.prizeIndex].rank + ': ' : ''}${PRIZES[g.prizeIndex].title}`
+                : '',
+            prizeLast: typeof PRIZES !== 'undefined' && g.prizeIndex === PRIZES.length - 1,
         };
     }
 

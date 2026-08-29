@@ -538,6 +538,46 @@ header {
     animation: pulse 1s ease-in-out infinite;
 }
 
+/* Prisvisning */
+.prize-content {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    align-items: center;
+    gap: 18px;
+}
+
+.prize-rank {
+    font-size: 1.6rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #aaa;
+    min-height: 1.6rem;
+}
+
+.prize-title {
+    font-size: 3.2rem;
+    color: #ffd700;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.prize-image {
+    max-width: 55vw;
+    max-height: 55vh;
+    object-fit: contain;
+    border: 5px solid #ffd700;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 12px;
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.4);
+}
+
+.prize-sub {
+    font-size: 1.8rem;
+    color: white;
+    text-align: center;
+}
+
 /* Standings */
 .standings-content {
     padding: 50px 60px !important;

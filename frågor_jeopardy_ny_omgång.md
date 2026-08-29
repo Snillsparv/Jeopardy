@@ -9,7 +9,7 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 
 ## Mediafiler
 
-✅ Alla 25 mediafiler finns på plats.
+✅ Alla 30 mediafiler finns på plats.
 
 - ✅ `images/questions/kalles_kaviar.jpg`
 - ✅ `images/questions/kalle_och_hobbe.jpg`
@@ -36,6 +36,11 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 - ✅ `images/questions/david_och_hanna.jpg`
 - ✅ `images/questions/jonas_och_lina.jpg`
 - ✅ `images/questions/jonas_och_ludde.jpg`
+- ✅ `sounds/questions/pippi_langstrump.mp3`
+- ✅ `sounds/questions/jocke_lundell.mp3`
+- ✅ `sounds/questions/carl_von_linne.mp3`
+- ✅ `sounds/questions/mahatma_gandhi.mp3`
+- ✅ `sounds/questions/justin_bieber.mp3`
 
 ---
 
@@ -168,12 +173,12 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 - **1 200** – 🖼️ Bild (`images/questions/jonas_och_lina.jpg`) — *Svar: Jonas och Lina*
 - **1 500** ⭐ **Daily Double** – 🖼️ Bild (`images/questions/jonas_och_ludde.jpg`) — *Svar: Jonas och Ludde*
 
-### Om programledaren
-- **300** – Djuret Jonas oftast förknippas med, vilket även är hans smeknamn — *Svar: sparven*
-- **600** – Namnen på Jonas bröder — *Svar: Jakob och Hannes*
-- **900** – Det Jonas vunnit VM i förutom minne — *Svar: Legorobotprogrammering*
-- **1 200** – Jonas favoritfärg — *Svar: röd*
-- **1 500** – Så många år har Jonas i oktober varit ihop med Jessica — *Svar: 18*
+### Vem har dött?
+- **300** – 🔊 Ljud (`sounds/questions/pippi_langstrump.mp3`) — *Svar: Pippi Långstrump*
+- **600** – 🔊 Ljud (`sounds/questions/jocke_lundell.mp3`) — *Svar: Jocke Lundell*
+- **900** – 🔊 Ljud (`sounds/questions/carl_von_linne.mp3`) — *Svar: Carl von Linné*
+- **1 200** – 🔊 Ljud (`sounds/questions/mahatma_gandhi.mp3`) — *Svar: Mahatma Gandhi*
+- **1 500** – 🔊 Ljud (`sounds/questions/justin_bieber.mp3`) — *Svar: Justin Bieber*
 
 ---
 

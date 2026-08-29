@@ -7,6 +7,9 @@ Nytt arkformat (ett blad, "Blad1"):
 - Fråga: kolumn A = svar/facit, kolumn B = ledtråd
 - Ledtråden "bild" → bildfråga: images/questions/<slug-av-svaret>.png
 - Ledtråden "ljud" → ljudfråga: sounds/questions/<slug-av-svaret>.mp3
+  (buzz öppnas när klippet spelats klart)
+- Ledtråden "ljud-direkt" → ljudfråga där buzz är öppen från start
+  (för långa klipp, t.ex. dödsrunorna)
 - Sist: "Final Jeopardy"-rad följd av finalfrågans svar + ledtråd
 
 Kategoriplacering (vilken spelplan och kolumnordning) styrs av PLACEMENT nedan.
@@ -50,7 +53,7 @@ PLACEMENT = [
         'Spårvagnar',
         'Avsluta ordvitsen',
         'Två av oss',
-        'Om programledaren',
+        'Vem har dött?',
     ],
 ]
 
@@ -62,6 +65,8 @@ def slugify(text):
     text = text.lower()
     text = re.sub(r'[åä]', 'a', text)
     text = re.sub(r'ö', 'o', text)
+    text = re.sub(r'[éè]', 'e', text)
+    text = re.sub(r'ü', 'u', text)
     text = re.sub(r'[^a-z0-9]+', '_', text)
     return text.strip('_')
 
@@ -107,9 +112,10 @@ def build_question(entry):
                 break
         # Neutral alt-text: en trasig bildladdning får inte avslöja svaret
         return f'<img src="{path}" alt="Bildfråga" class="question-image">', path
-    if clue == 'ljud':
+    if clue in ('ljud', 'ljud-direkt'):
         path = f"sounds/questions/{slugify(answer)}.mp3"
-        return (f'<div class="intro-question" data-audio-src="{path}">'
+        direct = ' data-buzz-direct="true"' if clue == 'ljud-direkt' else ''
+        return (f'<div class="intro-question" data-audio-src="{path}"{direct}>'
                 f'<p style="font-size: 8rem;">🔊</p></div>'), path
     if len(clue) <= 2 and not clue.isalnum():
         # Enstaka tecken (Tecken i tiden) visas i jätteformat

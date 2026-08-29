@@ -273,6 +273,14 @@
                 return wire(content);
             }
 
+            // Prisvisning
+            if (state.prizeOpen) {
+                content.innerHTML = `<div class="panel">
+                    <p class="hint">🎁 ${esc(state.prizeText)}</p>
+                    <button class="btn gold" data-key="PageDown">${state.prizeLast ? 'Vidare till finalen ▶' : 'Nästa pris'}</button></div>`;
+                return wire(content);
+            }
+
             // Öppen fråga
             if (state.question) {
                 if (state.ddAwaitingWager) {

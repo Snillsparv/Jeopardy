@@ -58,13 +58,18 @@ webbläsarens Gamepad API — inga mappningsprogram behövs). Valen sparas i
 webbläsaren på den datorn; "Återställ till 1–4" nollställer.
 
 En omgång: beloppen snurrar fram → PageDown avslöjar kategorierna en i taget →
-PageDown slumpar spelägare → ägaren väljer fråga (klick) → **buzzrarna är låsta
-tills värden läst klart och öppnar med PageDown** (en guldram runt skärmen tänds
-när det är fritt att buzza) → spelarna buzzar → PageDown/PageUp rättar.
+PageDown slumpar spelägare (**endast omgång 1** — sedan behåller den som äger
+spelet det in i nästa omgång) → ägaren väljer fråga (klick) → **buzzrarna är
+låsta tills värden läst klart och öppnar med PageDown** (en guldram runt skärmen
+tänds när det är fritt att buzza) → spelarna buzzar → PageDown/PageUp rättar.
 Bild- och symbolfrågor öppnas för buzz direkt; ljudfrågor öppnas automatiskt när
-klippet spelats klart (värden kan öppna tidigare). Vid Daily Double svarar
-spelägaren ensam efter att ha valt insats. Frågor stängs automatiskt 10 sekunder
-efter att buzzen öppnats om ingen buzzar.
+klippet spelats klart (värden kan öppna tidigare) — utom frågor markerade
+`ljud-direkt` (långa klipp, t.ex. dödsrunorna) där buzz är öppen från start och
+10-sekundersräknaren väntar tills klippet tystnat. Vid Daily Double svarar
+spelägaren ensam efter att ha valt insats.
+
+Efter omgång 3 visas ställningen, sedan **priserna** som bilder ett i taget
+(PageDown bläddrar; förstapriset förblir hemligt), och därefter startar finalen.
 
 I `/host`-läget finns motsvarande **🔔 Öppna för buzz**-knapp, och under **🧪 Test**
 finns knappar för att rensa spelplanen (hoppa till nästa omgång) och gå direkt
