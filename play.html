@@ -206,6 +206,10 @@
                 } else if (state.buzzerWinner !== null) {
                     mode = 'late'; label = 'FÖR SENT';
                     text = `${NAMES[state.buzzerWinner]} hann först`;
+                } else if (state.awaitingRead && !state.question.isDailyDouble) {
+                    text = state.question.kind === 'audio'
+                        ? 'Lyssna på klippet — buzz öppnas när det är klart'
+                        : 'Frågan läses upp — buzz öppnas strax…';
                 } else if (state.question.isDailyDouble) {
                     text = state.owner === me
                         ? 'Dubbelchans — du svarar själv!'

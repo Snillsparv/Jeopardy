@@ -44,6 +44,7 @@ class JeopardyGame {
             round3: []
         };
         this.currentQuestion = null;
+        this.buzzAwaitingRead = false; // buzz låst tills värden öppnat (textfrågor) eller klippet spelats klart
         this.buzzerActive = false;
         this.buzzerWinner = null;
         this.buzzerAttempts = [];
@@ -757,6 +758,32 @@ class JeopardyGame {
         }
     }
 
+    // Frågetyp avgör när buzzrarna öppnas
+    questionKind(question = this.currentQuestion) {
+        const html = question ? question.data.question : '';
+        if (html.includes('question-image')) return 'image';
+        if (html.includes('intro-question')) return 'audio';
+        if (html.includes('font-size: 10rem')) return 'symbol';
+        return 'text';
+    }
+
+    // Öppna buzzrarna: aktivera, tänd ramen och starta frågetimern
+    armBuzzers() {
+        if (!this.currentQuestion || this.answerShown) return;
+        this.buzzAwaitingRead = false;
+        this.activateBuzzer();
+        this.updateBuzzFrame();
+        this.startQuestionTimer(10);
+    }
+
+    updateBuzzFrame() {
+        const frame = document.getElementById('buzzFrame');
+        if (!frame) return;
+        const on = this.buzzerActive && this.currentQuestion !== null &&
+                   !this.currentQuestion.isDailyDouble;
+        frame.classList.toggle('on', on);
+    }
+
     showQuestion() {
         document.getElementById('questionValue').style.color = '#ffd700';
         document.getElementById('questionValue').style.fontSize = '3rem';
@@ -771,13 +798,32 @@ class JeopardyGame {
         // Sätt alla spelare till neutrala när ny fråga visas
         this.setPlayerFaces(null);
 
-        // Kolla om det är en ljudfråga och spela ljudet i bakgrunden
-        this.startQuestionAudio();
+        // Buzzrarna öppnas olika beroende på frågetyp:
+        // - bild/symbol: syns direkt → öppna på en gång
+        // - ljud: öppna när klippet spelats klart (värden kan öppna tidigare)
+        // - text: låst tills värden läst klart och öppnar (PageDown eller /host)
+        this.buzzerActive = false;
+        this.updateBuzzFrame();
+        const kind = this.questionKind();
 
-        // Aktivera buzzer och starta timer (20s för "Vem har dött", annars 10s)
-        this.activateBuzzer();
-        const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
-        this.startQuestionTimer(isDeathCategory ? 20 : 10);
+        if (kind === 'audio') {
+            this.buzzAwaitingRead = true;
+            this.startQuestionAudio();
+            const clip = this.introAudio;
+            const armIfStillWaiting = () => {
+                if (this.buzzAwaitingRead && this.currentQuestion) this.armBuzzers();
+            };
+            if (clip) {
+                clip.addEventListener('ended', armIfStillWaiting);
+                clip.addEventListener('error', armIfStillWaiting);
+            } else {
+                this.armBuzzers();
+            }
+        } else if (kind === 'image' || kind === 'symbol') {
+            this.armBuzzers();
+        } else {
+            this.buzzAwaitingRead = true;
+        }
     }
 
     startQuestionTimer(seconds = 10) {
@@ -897,6 +943,8 @@ class JeopardyGame {
         if (this.buzzerWinner === null) {
             this.buzzerWinner = playerIndex;
             this.buzzerActive = false;
+
+            this.updateBuzzFrame();
 
             // Pausa intro-ljud om det spelar
             if (this.introAudio && !this.introAudio.paused) {
@@ -1060,6 +1108,7 @@ class JeopardyGame {
                 setTimeout(() => {
                     this.buzzerWinner = null;
                     this.buzzerActive = true;
+                    this.updateBuzzFrame();
                     document.getElementById('buzzerStatus').textContent = '';
 
                     // Återställ frågetexten
@@ -1071,8 +1120,7 @@ class JeopardyGame {
                     }
 
                     // Starta ny timer
-                    const isDeathCategory = this.currentQuestion.category.toLowerCase().includes('vem har dött');
-                    this.startQuestionTimer(isDeathCategory ? 20 : 10);
+                    this.startQuestionTimer(10);
                 }, 400);
             } else {
                 setTimeout(() => {
@@ -1114,6 +1162,8 @@ class JeopardyGame {
         this.currentQuestion = null;
         this.answerShown = false;
         this.showingDeathCategoryAnswer = false;
+        this.buzzAwaitingRead = false;
+        this.updateBuzzFrame();
 
         document.querySelectorAll('.player').forEach(p => {
             p.classList.remove('active', 'buzzed');
@@ -1811,6 +1861,14 @@ class JeopardyGame {
                     }
                     this.showingDeathCategoryAnswer = false;
                     this.closeQuestionModal();
+                    return;
+                }
+
+                // PageDown öppnar buzzrarna när värden läst klart frågan
+                if (e.key === 'PageDown' && this.buzzAwaitingRead &&
+                    this.currentQuestion && !this.currentQuestion.isDailyDouble) {
+                    e.preventDefault();
+                    this.armBuzzers();
                     return;
                 }
 

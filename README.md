@@ -42,7 +42,7 @@ PageDown/PageUp fungerar utmärkt):
 
 | Tangent | Gör |
 |---|---|
-| **PageDown** | Nästa steg: avslöja kategori, slumpa spelägare, markera **rätt svar**, bekräfta insats, nästa steg i finalen |
+| **PageDown** | Nästa steg: avslöja kategori, slumpa spelägare, **öppna för buzz** när frågan är uppläst, markera **rätt svar**, bekräfta insats, nästa steg i finalen |
 | **PageUp** | Markera **fel svar** (frågor och finalrättning) |
 | **1–4** | Buzzer för spelare 1–4 (David, Ludde, Lina, Hanna) — kan bindas om, se nedan |
 | **F** | Växla fullskärm |
@@ -58,9 +58,17 @@ webbläsarens Gamepad API — inga mappningsprogram behövs). Valen sparas i
 webbläsaren på den datorn; "Återställ till 1–4" nollställer.
 
 En omgång: beloppen snurrar fram → PageDown avslöjar kategorierna en i taget →
-PageDown slumpar spelägare → ägaren väljer fråga (klick) → spelarna buzzar med 1–4 →
-PageDown/PageUp rättar. Vid Daily Double svarar spelägaren ensam efter att ha valt insats.
-Frågor stängs automatiskt efter 10 sekunder om ingen buzzar.
+PageDown slumpar spelägare → ägaren väljer fråga (klick) → **buzzrarna är låsta
+tills värden läst klart och öppnar med PageDown** (en guldram runt skärmen tänds
+när det är fritt att buzza) → spelarna buzzar → PageDown/PageUp rättar.
+Bild- och symbolfrågor öppnas för buzz direkt; ljudfrågor öppnas automatiskt när
+klippet spelats klart (värden kan öppna tidigare). Vid Daily Double svarar
+spelägaren ensam efter att ha valt insats. Frågor stängs automatiskt 10 sekunder
+efter att buzzen öppnats om ingen buzzar.
+
+I `/host`-läget finns motsvarande **🔔 Öppna för buzz**-knapp, och under **🧪 Test**
+finns knappar för att rensa spelplanen (hoppa till nästa omgång) och gå direkt
+till vinnarskärmen.
 
 ## Redigera frågor
 

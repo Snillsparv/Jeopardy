@@ -158,12 +158,23 @@
     <div id="content"><p class="hint">Väntar på spelskärmen… starta spelet på datorn (via <code>node server.js</code>).</p></div>
 
     <div class="footer" id="footer">
-        <button class="btn" id="adjustBtn">⚖️ Justera poäng</button>
+        <div class="btn-row" id="footerButtons">
+            <button class="btn" id="adjustBtn" style="margin-top:0">⚖️ Justera poäng</button>
+            <button class="btn" id="testBtn" style="margin-top:0">🧪 Test</button>
+        </div>
         <div id="adjustPanel" hidden>
             <div class="adjust-grid" id="adjustGrid"></div>
             <div class="btn-row">
                 <button class="btn green" id="adjustSave">Spara</button>
                 <button class="btn" id="adjustCancel">Avbryt</button>
+            </div>
+        </div>
+        <div id="testPanel" hidden>
+            <p class="hint" style="padding:4px 0">Testverktyg — inget för skarpt spel!</p>
+            <div class="btn-row">
+                <button class="btn" id="clearBoardBtn">⏭ Rensa spelplanen</button>
+                <button class="btn" id="jumpWinnerBtn">🏁 Vinnarskärmen</button>
+                <button class="btn" id="testClose">Stäng</button>
             </div>
         </div>
     </div>
@@ -279,9 +290,14 @@
                     ? `🔔 ${esc(state.names[state.buzzerWinner])} svarar!`
                     : state.question.isDailyDouble
                         ? `${esc(state.names[state.owner] ?? '')} svarar (dubbelchans)`
-                        : state.buzzerActive ? 'Väntar på buzz…' : '';
+                        : state.awaitingRead
+                            ? (state.question.kind === 'audio' ? '🔊 Klippet spelas — buzz öppnas när det är klart' : '🔒 Buzz låst — läs upp frågan')
+                            : state.buzzerActive ? '🔔 Buzz öppen — väntar…' : '';
+                const armButton = (state.awaitingRead && !state.question.isDailyDouble)
+                    ? `<button class="btn gold" data-key="PageDown">🔔 Öppna för buzz</button>` : '';
                 content.innerHTML = `${facitCard()}
                     <div class="buzzinfo">${buzzText}</div>
+                    ${armButton}
                     <div class="btn-row">
                         <button class="btn green" data-key="PageDown" ${canJudge ? '' : 'disabled'}>✓ RÄTT</button>
                         <button class="btn red" data-key="PageUp" ${canJudge ? '' : 'disabled'}>✗ FEL</button>
@@ -361,18 +377,31 @@
         // --- Poängjustering -------------------------------------------------
 
         const adjustPanel = document.getElementById('adjustPanel');
+        const testPanel = document.getElementById('testPanel');
+        const footerButtons = document.getElementById('footerButtons');
         document.getElementById('adjustBtn').onclick = () => {
             if (!state) return;
             document.getElementById('adjustGrid').innerHTML = state.names.map((n, i) => `
                 <div><label>${esc(n)}</label>
                 <input type="number" step="100" id="adj${i}" value="${state.scores[i]}"></div>`).join('');
             adjustPanel.hidden = false;
-            document.getElementById('adjustBtn').hidden = true;
+            footerButtons.hidden = true;
         };
         const closeAdjust = () => {
             adjustPanel.hidden = true;
-            document.getElementById('adjustBtn').hidden = false;
+            footerButtons.hidden = false;
         };
+
+        document.getElementById('testBtn').onclick = () => {
+            testPanel.hidden = false;
+            footerButtons.hidden = true;
+        };
+        document.getElementById('testClose').onclick = () => {
+            testPanel.hidden = true;
+            footerButtons.hidden = false;
+        };
+        document.getElementById('clearBoardBtn').onclick = () => send({ type: 'key', key: 'b' });
+        document.getElementById('jumpWinnerBtn').onclick = () => send({ type: 'key', key: 'j' });
         document.getElementById('adjustCancel').onclick = closeAdjust;
         document.getElementById('adjustSave').onclick = () => {
             const values = [0, 1, 2, 3].map(i =>
