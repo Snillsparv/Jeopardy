@@ -1,6 +1,6 @@
 # Jeopardy 2026 – Alla frågor
 
-Sammanställning av samtliga frågor i spelet, hämtade från `gamedata.js` (genererad från `frågor_jeopardy_2026.xlsx`).
+Sammanställning av samtliga frågor i spelets **första omgång** (spelad), ursprungligen genererad från `frågor_jeopardy_2026.xlsx`. Den nya omgången finns i `frågor_jeopardy_ny_omgång.md`.
 
 - **3 omgångar** × 6 kategorier × 5 frågor = 90 frågor, plus finalfrågan = **91 frågor totalt**
 - ⭐ = **Daily Double** (1 st i omgång 1, 2 st i omgång 2, 3 st i omgång 3)
