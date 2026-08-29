@@ -1,4 +1,8 @@
 // Jeopardy Game Logic
+
+// Spelarnas bildnamn i images/ — samma ordning som spelarlistan
+const PLAYER_IMAGES = ['david', 'ludde', 'lina', 'hanna'];
+
 class JeopardyGame {
     constructor() {
         this.currentRound = 1;
@@ -21,8 +25,6 @@ class JeopardyGame {
         this.answerShown = false;
         this.showingDeathCategoryAnswer = false; // För att kunna stänga med PageDown
         this.currentOwner = null; // Vem som senast svarade rätt (äger spelet)
-        this.questionTimer = null; // 10s timer för frågor
-        this.answerTimer = null; // 7s timer för svar
         this.timerInterval = null; // För grafisk timer
         this.timeRemaining = 0; // För grafisk display
 
@@ -40,7 +42,6 @@ class JeopardyGame {
         this.dailyDoubleCount = 0; // Räkna antal Daily Doubles
         this.currentAudio = null; // För att kunna stoppa ljud
         this.introAudio = null; // Separat för intro-ljud som ska fortsätta
-        this.currentVideo = null; // För att kunna stoppa video
 
         this.init();
     }
@@ -58,31 +59,18 @@ class JeopardyGame {
     }
 
     startGame() {
-        // Spela jingel
-        const jingle = this.playSound('sounds/jingel.mp3', 0.7);
-
-        // När jingeln är klar, starta spelet
-        jingle.onended = () => {
-            // Dölj startskärmen
+        // Spela jingeln och starta spelet när den är klar.
+        // Startar även om ljudet inte kan laddas/spelas, så spelet aldrig fastnar.
+        this.playSoundThen('sounds/jingel.mp3', 0.7, () => {
             document.getElementById('startScreen').style.display = 'none';
-            // Visa spelet
             document.getElementById('gameContainer').style.display = 'block';
 
-            // Rendera brädet och starta animationer
             this.renderBoard();
 
             // Starta beloppsanimation efter kort delay
             setTimeout(() => {
                 this.revealValuesInWave();
             }, 500);
-        };
-    }
-
-    playIntroMusic() {
-        const audio = new Audio('jeopardy-intro.mp3');
-        audio.volume = 0.5;
-        audio.play().catch(() => {
-            console.log('Intro-musik inte tillgänglig');
         });
     }
 
@@ -103,12 +91,21 @@ class JeopardyGame {
         return this.currentAudio;
     }
 
-    stopSound() {
-        if (this.currentAudio) {
-            this.currentAudio.pause();
-            this.currentAudio.currentTime = 0;
-            this.currentAudio = null;
-        }
+    // Spelar ett ljud och kör onDone exakt en gång när det är klart —
+    // även om filen saknas eller uppspelningen misslyckas.
+    playSoundThen(soundFile, volume, onDone) {
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            onDone();
+        };
+
+        const audio = this.playSound(soundFile, volume);
+        audio.onended = finish;
+        audio.onerror = finish;
+        audio.play().catch(finish);
+        return audio;
     }
 
     playIntroSound(soundFile, volume = 0.7) {
@@ -135,7 +132,8 @@ class JeopardyGame {
         }
     }
 
-    // Videohantering
+    // Videohantering. Kör onEnded exakt en gång när videon är klar —
+    // även om filen saknas eller inte kan spelas, så spelet aldrig fastnar.
     playVideo(videoFile, onEnded = null) {
         // Skapa video-element om det inte finns
         let videoElement = document.getElementById('gameVideo');
@@ -156,31 +154,21 @@ class JeopardyGame {
             document.body.appendChild(videoElement);
         }
 
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            videoElement.style.display = 'none';
+            if (onEnded) onEnded();
+        };
+
         videoElement.src = videoFile;
         videoElement.style.display = 'block';
-        videoElement.play();
+        videoElement.onended = finish;
+        videoElement.onerror = finish;
+        videoElement.play().catch(finish);
 
-        if (onEnded) {
-            videoElement.onended = () => {
-                videoElement.style.display = 'none';
-                onEnded();
-            };
-        } else {
-            videoElement.onended = () => {
-                videoElement.style.display = 'none';
-            };
-        }
-
-        this.currentVideo = videoElement;
         return videoElement;
-    }
-
-    stopVideo() {
-        const videoElement = document.getElementById('gameVideo');
-        if (videoElement) {
-            videoElement.pause();
-            videoElement.style.display = 'none';
-        }
     }
 
     renderBoard() {
@@ -231,15 +219,14 @@ class JeopardyGame {
                     questionDiv.textContent = '';
                 } else if (this.categoriesRevealed && this.ownerSelected) {
                     questionDiv.textContent = question.value;
+                    questionDiv.classList.add('clickable');
                     questionDiv.onclick = () => this.selectQuestion(col, row, isDailyDouble);
                 } else if (this.categoriesRevealed || this.valuesRevealed) {
                     // Visa belopp men inte klickbart förrän kategorier är avslöjade OCH ägare vald
                     questionDiv.textContent = question.value;
-                    questionDiv.style.cursor = 'default';
                 } else {
                     // Om belopp inte är avslöjade, visa tom ruta
                     questionDiv.textContent = '';
-                    questionDiv.style.cursor = 'default';
                 }
 
                 board.appendChild(questionDiv);
@@ -533,10 +520,11 @@ class JeopardyGame {
         });
 
         const maxWager = Math.max(maxBoardValue, ownerScore);
+        this.currentQuestion.maxWager = maxWager;
 
         // Visa glad bild på spelaren
         const ownerImageSrc = this.currentOwner !== null ?
-            `images/${['david', 'ludde', 'lina', 'hanna'][this.currentOwner]}_glad.png` : '';
+            `images/${PLAYER_IMAGES[this.currentOwner]}_glad.png` : '';
 
         document.getElementById('questionText').innerHTML = `
             <div style="text-align: center;">
@@ -562,7 +550,10 @@ class JeopardyGame {
     }
 
     showDailyDoubleQuestion(wager) {
-        this.currentQuestion.wager = wager;
+        // Begränsa insatsen till det tillåtna intervallet, oavsett vad som skrivits i fältet
+        const maxWager = this.currentQuestion.maxWager ?? wager;
+        this.currentQuestion.wager = Math.min(Math.max(0, wager), maxWager);
+        wager = this.currentQuestion.wager;
 
         document.getElementById('questionValue').style.color = '#ffd700';
         document.getElementById('questionValue').style.fontSize = '3rem';
@@ -574,8 +565,19 @@ class JeopardyGame {
         document.getElementById('buzzerStatus').textContent =
             `${this.players[this.currentOwner].name} svarar...`;
 
+        // Spela ev. ljudfråga även när den är en Daily Double
+        this.startQuestionAudio();
+
         // Starta 10-sekunders timer för Daily Double
         this.startAnswerTimer(10);
+    }
+
+    // Om frågan är en ljudfråga (.intro-question), spela ljudet i bakgrunden
+    startQuestionAudio() {
+        const introQuestion = document.querySelector('#questionText .intro-question');
+        if (introQuestion && introQuestion.dataset.audioSrc) {
+            this.playIntroSound(introQuestion.dataset.audioSrc, 0.7);
+        }
     }
 
     showQuestion() {
@@ -592,11 +594,8 @@ class JeopardyGame {
         // Sätt alla spelare till neutrala när ny fråga visas
         this.setPlayerFaces(null);
 
-        // Kolla om det är en intro-fråga och spela ljudet i bakgrunden
-        const introQuestion = document.querySelector('.intro-question');
-        if (introQuestion && introQuestion.dataset.audioSrc) {
-            this.playIntroSound(introQuestion.dataset.audioSrc, 0.7);
-        }
+        // Kolla om det är en ljudfråga och spela ljudet i bakgrunden
+        this.startQuestionAudio();
 
         // Aktivera buzzer och starta timer (20s för "Vem har dött", annars 10s)
         this.activateBuzzer();
@@ -695,29 +694,11 @@ class JeopardyGame {
     }
 
     clearTimers() {
-        if (this.questionTimer) {
-            clearTimeout(this.questionTimer);
-            this.questionTimer = null;
-        }
-        if (this.answerTimer) {
-            clearTimeout(this.answerTimer);
-            this.answerTimer = null;
-        }
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
             this.timerInterval = null;
         }
         document.getElementById('timerDisplay').classList.add('hidden');
-    }
-
-    showAnswer() {
-        this.clearTimers();
-        this.answerShown = true;
-        this.markQuestionAsAnswered();
-
-        this.autoCloseTimeout = setTimeout(() => {
-            this.closeQuestionModal();
-        }, 5000);
     }
 
     activateBuzzer() {
@@ -752,7 +733,7 @@ class JeopardyGame {
 
             // Dölj frågetexten och visa spelarens ansikte istället
             const player = this.players[playerIndex];
-            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerNames = PLAYER_IMAGES;
             const playerImageSrc = `images/${playerNames[playerIndex]}.png`;
 
             document.getElementById('questionText').innerHTML = `
@@ -783,8 +764,7 @@ class JeopardyGame {
             // Daily Double
             const wager = this.currentQuestion.wager || this.currentQuestion.data.value;
             this.players[this.currentOwner].score += wager;
-            this.currentOwner = this.currentOwner; // Behåller äganderätten
-            winnerIndex = this.currentOwner;
+            winnerIndex = this.currentOwner; // Ägaren behåller äganderätten
 
             // Spela applåd för rätt svar på Daily Double
             this.playSound('sounds/applåd.mp3', 0.7);
@@ -803,7 +783,7 @@ class JeopardyGame {
 
         // Visa glatt ansikte i 0.2 sekunder
         if (winnerIndex !== null) {
-            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerNames = PLAYER_IMAGES;
             const playerImageSrc = `images/${playerNames[winnerIndex]}_glad.png`;
             const player = this.players[winnerIndex];
 
@@ -856,7 +836,7 @@ class JeopardyGame {
             this.updatePlayerScores();
 
             // Visa ledset ansikte i 0.4 sekunder
-            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerNames = PLAYER_IMAGES;
             const playerImageSrc = `images/${playerNames[this.currentOwner]}_ledsen.png`;
             const player = this.players[this.currentOwner];
 
@@ -884,7 +864,7 @@ class JeopardyGame {
             playerElement.classList.remove('buzzed', 'active');
 
             // Visa ledset ansikte i 0.4 sekunder
-            const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+            const playerNames = PLAYER_IMAGES;
             const playerImageSrc = `images/${playerNames[this.buzzerWinner]}_ledsen.png`;
             const player = this.players[this.buzzerWinner];
 
@@ -1035,7 +1015,7 @@ class JeopardyGame {
 
         // Bygg upp HTML för spelarna
         const standingsContainer = document.getElementById('standingsPlayers');
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
 
         standingsContainer.innerHTML = sortedPlayers.map((player, rank) => {
             const rankText = ['1:a plats', '2:a plats', '3:e plats', '4:e plats'][rank];
@@ -1131,7 +1111,7 @@ class JeopardyGame {
 
         const player = this.players[this.finalCurrentPlayer];
         const maxWager = player.score;
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
 
         // Visa spelarens glada bild
         document.getElementById('finalPlayerImage').src = `images/${playerNames[this.finalCurrentPlayer]}_glad.png`;
@@ -1143,8 +1123,10 @@ class JeopardyGame {
     }
 
     confirmWager() {
+        // Begränsa insatsen till 0..spelarens poäng, oavsett vad som skrivits i fältet
+        const maxWager = this.players[this.finalCurrentPlayer].score;
         const wager = parseInt(document.getElementById('finalWagerInput').value) || 0;
-        this.finalWagers[this.finalCurrentPlayer] = wager;
+        this.finalWagers[this.finalCurrentPlayer] = Math.min(Math.max(0, wager), maxWager);
         this.finalCurrentPlayer++;
         this.showNextWager();
     }
@@ -1159,13 +1141,11 @@ class JeopardyGame {
         document.getElementById('finalCategorySection').classList.add('hidden');
         document.getElementById('finalQuestionSection').classList.remove('hidden');
 
-        // Spela Final Jeopardy-musik
-        const music = this.playSound('sounds/musik_finalsvar.mp3', 0.7);
-
-        // När musiken tar slut, visa rättningsskärmen
-        music.onended = () => {
+        // Spela Final Jeopardy-musik; när den tar slut (eller inte kan
+        // spelas) visas rättningsskärmen
+        this.playSoundThen('sounds/musik_finalsvar.mp3', 0.7, () => {
             this.showCorrectionScreen();
-        };
+        });
     }
 
     showCorrectionScreen() {
@@ -1196,7 +1176,7 @@ class JeopardyGame {
 
         const player = this.players[this.finalCurrentPlayer];
         const wager = this.finalWagers[this.finalCurrentPlayer];
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
         const playerImageSrc = `images/${playerNames[this.finalCurrentPlayer]}.png`;
 
         // Återställ och visa spelarinformation
@@ -1213,7 +1193,6 @@ class JeopardyGame {
 
     finalAnswerCorrect() {
         const wager = this.finalWagers[this.finalCurrentPlayer];
-        const oldScore = this.players[this.finalCurrentPlayer].score;
         this.players[this.finalCurrentPlayer].score += wager;
         const newScore = this.players[this.finalCurrentPlayer].score;
         this.updatePlayerScores();
@@ -1222,7 +1201,7 @@ class JeopardyGame {
         document.getElementById('revealWrongBtn').classList.add('hidden');
 
         // Visa glatt ansikte
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
         const gladImageSrc = `images/${playerNames[this.finalCurrentPlayer]}_glad.png`;
         document.getElementById('revealPlayerImage').src = gladImageSrc;
         document.getElementById('revealCurrentScore').innerHTML = `<span style="color: #90EE90;">✓ Rätt svar!</span>`;
@@ -1243,7 +1222,6 @@ class JeopardyGame {
 
     finalAnswerWrong() {
         const wager = this.finalWagers[this.finalCurrentPlayer];
-        const oldScore = this.players[this.finalCurrentPlayer].score;
         this.players[this.finalCurrentPlayer].score -= wager;
         const newScore = this.players[this.finalCurrentPlayer].score;
         this.updatePlayerScores();
@@ -1252,7 +1230,7 @@ class JeopardyGame {
         document.getElementById('revealWrongBtn').classList.add('hidden');
 
         // Visa ledset ansikte
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
         const sadImageSrc = `images/${playerNames[this.finalCurrentPlayer]}_ledsen.png`;
         document.getElementById('revealPlayerImage').src = sadImageSrc;
         document.getElementById('revealCurrentScore').innerHTML = `<span style="color: #dc3545;">✗ Fel svar!</span>`;
@@ -1280,7 +1258,7 @@ class JeopardyGame {
         // Uppdatera ansikten baserat på placering
         this.setPlayerFacesByPlacement();
 
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
         const sortedPlayers = this.players.map((player, index) => ({
             ...player,
             index
@@ -1389,7 +1367,7 @@ class JeopardyGame {
     }
 
     setPlayerFaces(winnerIndex = null) {
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
 
         this.players.forEach((player, index) => {
             const imageElement = document.getElementById(`player${index + 1}-image`);
@@ -1411,7 +1389,7 @@ class JeopardyGame {
     }
 
     setPlayerFacesByPlacement() {
-        const playerNames = ['david', 'ludde', 'lina', 'hanna'];
+        const playerNames = PLAYER_IMAGES;
 
         // Skapa kopia av spelare med deras index
         const playersWithIndex = this.players.map((player, index) => ({
@@ -1452,22 +1430,27 @@ class JeopardyGame {
             const finalRevealSection = document.getElementById('finalRevealSection');
             const finalWagerSection = document.getElementById('finalWagerSection');
 
+            // Bokstavs- och buzzertangenter ska inte triggas när man
+            // skriver i ett inmatningsfält (t.ex. insats eller poäng)
+            const typingInInput = e.target &&
+                (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
+
             // R key - toggle score management modal
-            if (e.key === 'r' || e.key === 'R') {
+            if (!typingInInput && (e.key === 'r' || e.key === 'R')) {
                 e.preventDefault();
                 this.toggleScoreManagement();
                 return;
             }
 
             // B key - debug clear board
-            if (e.key === 'b' || e.key === 'B') {
+            if (!typingInInput && (e.key === 'b' || e.key === 'B')) {
                 e.preventDefault();
                 this.debugClearBoard();
                 return;
             }
 
             // J key - jump to winner screen
-            if (e.key === 'j' || e.key === 'J') {
+            if (!typingInInput && (e.key === 'j' || e.key === 'J')) {
                 e.preventDefault();
                 finalModal.classList.add('hidden');
                 this.showWinner();
@@ -1509,7 +1492,7 @@ class JeopardyGame {
             }
 
             // Buzzer-tangenter
-            if (this.buzzerActive) {
+            if (this.buzzerActive && !typingInInput) {
                 const playerIndex = this.players.findIndex(p => p.buzzerKey === e.key);
                 if (playerIndex !== -1) {
                     e.preventDefault();
