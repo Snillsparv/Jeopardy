@@ -105,8 +105,8 @@ def build_question(entry):
             if os.path.exists(candidate):
                 path = candidate
                 break
-        alt = html.escape(answer, quote=True)
-        return f'<img src="{path}" alt="{alt}" class="question-image">', path
+        # Neutral alt-text: en trasig bildladdning får inte avslöja svaret
+        return f'<img src="{path}" alt="Bildfråga" class="question-image">', path
     if clue == 'ljud':
         path = f"sounds/questions/{slugify(answer)}.mp3"
         return (f'<div class="intro-question" data-audio-src="{path}">'
