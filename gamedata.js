@@ -24,7 +24,7 @@ const gameData = {
                 {value: 200, question: "Huvudkomponenten när bilden i ett spel ska ritas upp, förkortas GPU", answer: "grafikkortet"},
                 {value: 300, question: "Datorns \"hjärna\" som oftast står för själva beräkningarna", answer: "processorn"},
                 {value: 400, question: "Minne som töms helt varje gång datorn startas om", answer: "RAM-minnet"},
-                {value: 500, question: "Modern typ av hårddisk som kommer åt minnen snabbare än klassiska HDD", answer: "SSD"},
+                {value: 500, question: "Modern typ av hårddisk som kommer åt data snabbare än klassiska HDD", answer: "SSD"},
             ],
             [
                 {value: 100, question: "Rikast i staden", answer: "Krösus Sork"},
@@ -107,7 +107,7 @@ const gameData = {
                 {value: 300, question: "Skrek \"Heureka!\" i badkaret i Syrakusa", answer: "Arkimedes"},
                 {value: 600, question: "Knäckte Enigma och gav namn åt ett berömt test för maskinintelligens", answer: "Alan Turing"},
                 {value: 900, question: "Världens främsta nu levande matematiker med australiensiskt ursprung och asiatiskt efternamn", answer: "Terence Tao"},
-                {value: 1200, question: "Historiens mest produktive matematiker som gav oss beteckningarna e och π samt arbetade vidare även som blind", answer: "Leonhard Euler"},
+                {value: 1200, question: "Historiens mest produktive matematiker som gav oss beteckningen e, populariserade π och arbetade vidare även som blind", answer: "Leonhard Euler"},
                 {value: 1500, question: "Självlärd indisk matematiker som reste till England runt förra sekelskiftet", answer: "Ramanujan"},
             ],
             [

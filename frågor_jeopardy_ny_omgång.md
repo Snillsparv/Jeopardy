@@ -60,7 +60,7 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 - **200** – Huvudkomponenten när bilden i ett spel ska ritas upp, förkortas GPU — *Svar: grafikkortet*
 - **300** – Datorns "hjärna" som oftast står för själva beräkningarna — *Svar: processorn*
 - **400** – Minne som töms helt varje gång datorn startas om — *Svar: RAM-minnet*
-- **500** – Modern typ av hårddisk som kommer åt minnen snabbare än klassiska HDD — *Svar: SSD*
+- **500** – Modern typ av hårddisk som kommer åt data snabbare än klassiska HDD — *Svar: SSD*
 
 ### I Bamses värld
 - **100** – Rikast i staden — *Svar: Krösus Sork*
@@ -137,7 +137,7 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 - **300** – Skrek "Heureka!" i badkaret i Syrakusa — *Svar: Arkimedes*
 - **600** – Knäckte Enigma och gav namn åt ett berömt test för maskinintelligens — *Svar: Alan Turing*
 - **900** ⭐ **Daily Double** – Världens främsta nu levande matematiker med australiensiskt ursprung och asiatiskt efternamn — *Svar: Terence Tao*
-- **1 200** – Historiens mest produktive matematiker som gav oss beteckningarna e och π samt arbetade vidare även som blind — *Svar: Leonhard Euler*
+- **1 200** – Historiens mest produktive matematiker som gav oss beteckningen e, populariserade π och arbetade vidare även som blind — *Svar: Leonhard Euler*
 - **1 500** – Självlärd indisk matematiker som reste till England runt förra sekelskiftet — *Svar: Ramanujan*
 
 ### Land efter yta
