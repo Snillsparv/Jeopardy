@@ -202,6 +202,18 @@
                 </div>
             `;
             document.querySelector('.start-content').appendChild(panel);
+
+            // Har datorn flera nätverksadresser kan QR-koden peka på fel —
+            // visa då alternativen så man kan skriva in adressen för hand.
+            const extra = (info.addresses || []).slice(1);
+            if (extra.length) {
+                const alt = document.createElement('div');
+                alt.className = 'join-url';
+                alt.style.marginTop = '14px';
+                alt.textContent = 'Funkar inte QR-koden? Prova i stället: ' +
+                    extra.map(ip => `http://${ip}:${info.port}/host`).join('  ·  ');
+                document.querySelector('.start-content').appendChild(alt);
+            }
         } catch { /* utan QR-panel funkar allt ändå */ }
     }
 

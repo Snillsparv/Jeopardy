@@ -155,13 +155,16 @@ const server = http.createServer((req, res) => {
     }
 
     if (pathname === '/server-info') {
-        const ip = lanAddresses()[0] || 'localhost';
+        const ips = lanAddresses();
+        const ip = ips[0] || 'localhost';
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
             jeopardy: true,
             port: PORT,
             hostUrl: `http://${ip}:${PORT}/host`,
             playUrl: `http://${ip}:${PORT}/play`,
+            // Alla adresser, om datorn har flera nätverk (t.ex. VPN-adaptrar)
+            addresses: ips,
         }));
         return;
     }
