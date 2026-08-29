@@ -3,15 +3,39 @@
 // Spelarnas bildnamn i images/ — samma ordning som spelarlistan
 const PLAYER_IMAGES = ['david', 'ludde', 'lina', 'hanna'];
 
+// Standardtangenter för buzzers; kan skrivas över via "Ställ in buzzers"
+const DEFAULT_BUZZER_KEYS = ['1', '2', '3', '4'];
+
+// Tangenter som spelet självt använder och som därför inte kan vara buzzers
+const RESERVED_KEYS = ['r', 'b', 'j', 'f', 'pagedown', 'pageup', 'escape'];
+
+function loadBuzzerKeys() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('buzzerKeys'));
+        if (Array.isArray(saved) && saved.length === 4 && saved.every(k => typeof k === 'string')) {
+            return saved;
+        }
+    } catch { /* trasig/otillgänglig lagring → standard */ }
+    return [...DEFAULT_BUZZER_KEYS];
+}
+
+function keyLabel(key) {
+    if (key === ' ') return 'Mellanslag';
+    return key.length === 1 ? key.toUpperCase() : key;
+}
+
 class JeopardyGame {
     constructor() {
         this.currentRound = 1;
+        const buzzerKeys = loadBuzzerKeys();
         this.players = [
-            { name: 'David', score: 0, buzzerKey: '1' },
-            { name: 'Ludde', score: 0, buzzerKey: '2' },
-            { name: 'Lina', score: 0, buzzerKey: '3' },
-            { name: 'Hanna', score: 0, buzzerKey: '4' }
+            { name: 'David', score: 0, buzzerKey: buzzerKeys[0] },
+            { name: 'Ludde', score: 0, buzzerKey: buzzerKeys[1] },
+            { name: 'Lina', score: 0, buzzerKey: buzzerKeys[2] },
+            { name: 'Hanna', score: 0, buzzerKey: buzzerKeys[3] }
         ];
+        this.buzzerSetupIndex = null; // spelare som just nu väntar på knapptryck
+        this.buzzerSetupKeys = [];    // insamlade tangenter under pågående inställning
         this.answeredQuestions = {
             round1: [],
             round2: [],
@@ -50,11 +74,112 @@ class JeopardyGame {
         // Sätt upp event listeners men starta inte spelet än
         this.setupEventListeners();
         this.updatePlayerScores();
+        this.updateBuzzerLabels();
 
         // Lägg till event listener för startknappen
         const startBtn = document.getElementById('startGameBtn');
         if (startBtn) {
             startBtn.onclick = () => this.startGame();
+        }
+
+        const setupBtn = document.getElementById('setupBuzzersBtn');
+        if (setupBtn) {
+            setupBtn.onclick = () => this.startBuzzerSetup();
+        }
+        const resetBtn = document.getElementById('buzzerResetBtn');
+        if (resetBtn) {
+            resetBtn.onclick = () => this.resetBuzzerKeys();
+        }
+    }
+
+    // --- Buzzer-inställning -------------------------------------------------
+
+    updateBuzzerLabels() {
+        this.players.forEach((player, index) => {
+            const label = document.querySelector(`#player${index + 1} .player-buzzer`);
+            if (label) label.textContent = `Tangent: ${keyLabel(player.buzzerKey)}`;
+        });
+    }
+
+    startBuzzerSetup() {
+        this.buzzerSetupIndex = 0;
+        this.buzzerSetupKeys = [];
+        document.getElementById('buzzerSetupModal').classList.remove('hidden');
+        this.renderBuzzerSetup();
+    }
+
+    renderBuzzerSetup(message = '') {
+        const index = this.buzzerSetupIndex;
+        document.getElementById('buzzerSetupPrompt').innerHTML = message ||
+            `Tryck på <b>${this.players[index].name}s</b> buzzer…`;
+
+        document.getElementById('buzzerSetupList').innerHTML = this.players.map((player, i) => {
+            const captured = this.buzzerSetupKeys[i];
+            const status = captured !== undefined
+                ? `✓ ${keyLabel(captured)}`
+                : (i === index ? '⌨️ …' : '–');
+            return `<div class="buzzer-setup-row ${i === index ? 'current' : ''}">
+                <span>${player.name}</span><span>${status}</span>
+            </div>`;
+        }).join('');
+    }
+
+    handleBuzzerSetupKey(key) {
+        if (key === 'Escape') {
+            this.cancelBuzzerSetup();
+            return;
+        }
+        if (RESERVED_KEYS.includes(key.toLowerCase())) {
+            this.renderBuzzerSetup(`<b>${keyLabel(key)}</b> används redan av spelet — välj en annan knapp för <b>${this.players[this.buzzerSetupIndex].name}</b>.`);
+            return;
+        }
+        if (this.buzzerSetupKeys.includes(key)) {
+            this.renderBuzzerSetup(`<b>${keyLabel(key)}</b> är redan tagen — välj en annan knapp för <b>${this.players[this.buzzerSetupIndex].name}</b>.`);
+            return;
+        }
+
+        this.buzzerSetupKeys[this.buzzerSetupIndex] = key;
+        this.buzzerSetupIndex++;
+
+        if (this.buzzerSetupIndex >= this.players.length) {
+            this.finishBuzzerSetup();
+        } else {
+            this.renderBuzzerSetup();
+        }
+    }
+
+    finishBuzzerSetup() {
+        this.players.forEach((player, i) => { player.buzzerKey = this.buzzerSetupKeys[i]; });
+        try {
+            localStorage.setItem('buzzerKeys', JSON.stringify(this.buzzerSetupKeys));
+        } catch { /* privat läge etc. — funkar ändå tills sidan laddas om */ }
+        this.updateBuzzerLabels();
+        this.buzzerSetupIndex = null;
+
+        this.renderBuzzerSetup(`✓ Klart! Buzzrarna är kopplade.`);
+        setTimeout(() => {
+            document.getElementById('buzzerSetupModal').classList.add('hidden');
+        }, 1200);
+    }
+
+    cancelBuzzerSetup() {
+        this.buzzerSetupIndex = null;
+        this.buzzerSetupKeys = [];
+        document.getElementById('buzzerSetupModal').classList.add('hidden');
+    }
+
+    resetBuzzerKeys() {
+        try { localStorage.removeItem('buzzerKeys'); } catch { /* ok */ }
+        this.players.forEach((player, i) => { player.buzzerKey = DEFAULT_BUZZER_KEYS[i]; });
+        this.updateBuzzerLabels();
+        this.cancelBuzzerSetup();
+    }
+
+    toggleFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+        } else {
+            document.documentElement.requestFullscreen().catch(() => {});
         }
     }
 
@@ -1430,10 +1555,24 @@ class JeopardyGame {
             const finalRevealSection = document.getElementById('finalRevealSection');
             const finalWagerSection = document.getElementById('finalWagerSection');
 
+            // Pågående buzzer-inställning fångar alla tangenter först
+            if (this.buzzerSetupIndex !== null) {
+                e.preventDefault();
+                this.handleBuzzerSetupKey(e.key);
+                return;
+            }
+
             // Bokstavs- och buzzertangenter ska inte triggas när man
             // skriver i ett inmatningsfält (t.ex. insats eller poäng)
             const typingInInput = e.target &&
                 (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
+
+            // F key - växla fullskärm
+            if (!typingInInput && (e.key === 'f' || e.key === 'F')) {
+                e.preventDefault();
+                this.toggleFullscreen();
+                return;
+            }
 
             // R key - toggle score management modal
             if (!typingInInput && (e.key === 'r' || e.key === 'R')) {

@@ -44,6 +44,65 @@ body {
     box-shadow: 0 12px 30px rgba(255, 215, 0, 0.5);
 }
 
+.setup-buzzers-btn {
+    margin-top: 30px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    background: none;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 8px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.setup-buzzers-btn:hover {
+    border-color: #ffd700;
+    color: white;
+}
+
+/* Buzzer-inställningsmodal */
+.buzzer-setup-content {
+    max-width: 700px !important;
+    height: auto !important;
+    padding: 60px !important;
+}
+
+.buzzer-setup-prompt {
+    font-size: 1.6rem;
+    min-height: 44px;
+    margin-bottom: 25px;
+}
+
+.buzzer-setup-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.buzzer-setup-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    font-size: 1.3rem;
+    border: 2px solid transparent;
+}
+
+.buzzer-setup-row.current {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.buzzer-setup-hint {
+    margin-top: 25px;
+    font-size: 0.95rem;
+    color: #aaa;
+    line-height: 1.5;
+}
+
 /* QR-panel för telefonanslutning (visas bara i serverläge) */
 .join-panel {
     display: flex;

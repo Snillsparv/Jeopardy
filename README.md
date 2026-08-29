@@ -44,10 +44,17 @@ PageDown/PageUp fungerar utmärkt):
 |---|---|
 | **PageDown** | Nästa steg: avslöja kategori, slumpa spelägare, markera **rätt svar**, bekräfta insats, nästa steg i finalen |
 | **PageUp** | Markera **fel svar** (frågor och finalrättning) |
-| **1–4** | Buzzer för spelare 1–4 (David, Ludde, Lina, Hanna) |
+| **1–4** | Buzzer för spelare 1–4 (David, Ludde, Lina, Hanna) — kan bindas om, se nedan |
+| **F** | Växla fullskärm |
 | **R** | Öppna/stäng poängjustering |
 | **B** | (Debug) Rensa hela spelplanen och gå till nästa omgång |
 | **J** | (Debug) Hoppa direkt till vinnarskärmen |
+
+**Koppla fysiska buzzers:** klicka **🔧 Ställ in buzzers** på startskärmen och tryck
+på varje spelares buzzer i tur och ordning — spelet binder då knapparna till vad
+buzzrarna faktiskt skickar (fungerar med alla kontroller som beter sig som
+tangentbord). Valen sparas i webbläsaren på den datorn; "Återställ till 1–4"
+nollställer.
 
 En omgång: beloppen snurrar fram → PageDown avslöjar kategorierna en i taget →
 PageDown slumpar spelägare → ägaren väljer fråga (klick) → spelarna buzzar med 1–4 →

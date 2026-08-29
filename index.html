@@ -15,6 +15,21 @@
     <div id="startScreen" class="start-screen">
         <div class="start-content">
             <button id="startGameBtn" class="start-btn">Starta spelet</button>
+            <div>
+                <button id="setupBuzzersBtn" class="setup-buzzers-btn">🔧 Ställ in buzzers</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buzzer-inställning -->
+    <div id="buzzerSetupModal" class="modal hidden">
+        <div class="modal-content buzzer-setup-content">
+            <h2 style="font-size: 2.5rem; color: #ffd700; margin-bottom: 20px;">Ställ in buzzers</h2>
+            <p id="buzzerSetupPrompt" class="buzzer-setup-prompt"></p>
+            <div id="buzzerSetupList" class="buzzer-setup-list"></div>
+            <p class="buzzer-setup-hint">Tryck på respektive spelares buzzer när den efterfrågas.<br>
+               Valen sparas på den här datorn. Esc avbryter utan att spara.</p>
+            <button id="buzzerResetBtn" class="btn" style="margin-top: 20px;">Återställ till 1–4</button>
         </div>
     </div>
 
