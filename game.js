@@ -20,6 +20,7 @@ function loadBuzzerKeys() {
 }
 
 function keyLabel(key) {
+    if (key.startsWith('pad:')) return `🎮 Knapp ${key.slice(4)}`;
     if (key === ' ') return 'Mellanslag';
     return key.length === 1 ? key.toUpperCase() : key;
 }
@@ -36,6 +37,7 @@ class JeopardyGame {
         ];
         this.buzzerSetupIndex = null; // spelare som just nu väntar på knapptryck
         this.buzzerSetupKeys = [];    // insamlade tangenter under pågående inställning
+        this.gamepadPressed = new Set(); // nedtryckta gamepadknappar (för flanktrigg)
         this.answeredQuestions = {
             round1: [],
             round2: [],
@@ -90,6 +92,55 @@ class JeopardyGame {
         if (resetBtn) {
             resetBtn.onclick = () => this.resetBuzzerKeys();
         }
+
+        this.startGamepadPolling();
+    }
+
+    // --- Gamepad-buzzers (t.ex. PlayStation Buzz!) ---------------------------
+    // Buzz-kontroller och liknande är handkontroller, inte tangentbord.
+    // Vi pollar Gamepad API:t varje bildruta och reagerar på nedtryck
+    // (flank), både under buzzer-inställningen och i spelet.
+
+    startGamepadPolling() {
+        const poll = () => {
+            const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+            for (const pad of pads) {
+                if (!pad || !pad.connected) continue;
+                pad.buttons.forEach((button, btnIndex) => {
+                    const physical = `${pad.index}:${btnIndex}`;
+                    if (button.pressed && !this.gamepadPressed.has(physical)) {
+                        this.gamepadPressed.add(physical);
+                        this.onGamepadButton(`pad:${btnIndex}`);
+                    } else if (!button.pressed) {
+                        this.gamepadPressed.delete(physical);
+                    }
+                });
+            }
+            requestAnimationFrame(poll);
+        };
+        requestAnimationFrame(poll);
+    }
+
+    onGamepadButton(id) {
+        if (this.buzzerSetupIndex !== null) {
+            this.handleBuzzerSetupKey(id);
+            this.updateGamepadStatus();
+            return;
+        }
+        const playerIndex = this.players.findIndex(p => p.buzzerKey === id);
+        if (playerIndex !== -1) {
+            this.handleBuzzer(playerIndex);
+        }
+    }
+
+    updateGamepadStatus() {
+        const el = document.getElementById('buzzerSetupGamepads');
+        if (!el) return;
+        const pads = Array.from(navigator.getGamepads ? navigator.getGamepads() : [])
+            .filter(p => p && p.connected);
+        el.textContent = pads.length
+            ? `🎮 Upptäckt: ${pads.map(p => p.id).join(', ')}`
+            : '🎮 Ingen handkontroll upptäckt ännu — tryck på valfri knapp så vaknar den.';
     }
 
     // --- Buzzer-inställning -------------------------------------------------
@@ -106,6 +157,7 @@ class JeopardyGame {
         this.buzzerSetupKeys = [];
         document.getElementById('buzzerSetupModal').classList.remove('hidden');
         this.renderBuzzerSetup();
+        this.updateGamepadStatus();
     }
 
     renderBuzzerSetup(message = '') {

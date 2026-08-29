@@ -52,9 +52,10 @@ PageDown/PageUp fungerar utmärkt):
 
 **Koppla fysiska buzzers:** klicka **🔧 Ställ in buzzers** på startskärmen och tryck
 på varje spelares buzzer i tur och ordning — spelet binder då knapparna till vad
-buzzrarna faktiskt skickar (fungerar med alla kontroller som beter sig som
-tangentbord). Valen sparas i webbläsaren på den datorn; "Återställ till 1–4"
-nollställer.
+kontrollerna faktiskt skickar. Fungerar både med kontroller som beter sig som
+tangentbord och med handkontroller/gamepads som **PlayStation Buzz!** (läses via
+webbläsarens Gamepad API — inga mappningsprogram behövs). Valen sparas i
+webbläsaren på den datorn; "Återställ till 1–4" nollställer.
 
 En omgång: beloppen snurrar fram → PageDown avslöjar kategorierna en i taget →
 PageDown slumpar spelägare → ägaren väljer fråga (klick) → spelarna buzzar med 1–4 →
