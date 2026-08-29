@@ -951,6 +951,8 @@ class JeopardyGame {
             this.players[this.buzzerWinner].score += value;
             this.currentOwner = this.buzzerWinner; // Ny ägare!
             winnerIndex = this.buzzerWinner;
+
+            this.playSound('sounds/rätt_svar.wav', 0.5);
         }
 
         this.updatePlayerScores();
@@ -1005,6 +1007,7 @@ class JeopardyGame {
 
     answerWrong() {
         this.clearTimers();
+        this.playSound('sounds/fel_svar.wav', 0.45);
 
         if (this.currentQuestion.isDailyDouble && this.currentOwner !== null) {
             // Daily Double - förlora insatsen
@@ -1369,6 +1372,7 @@ class JeopardyGame {
     }
 
     finalAnswerCorrect() {
+        this.playSound('sounds/applåd.mp3', 0.7);
         const wager = this.finalWagers[this.finalCurrentPlayer];
         this.players[this.finalCurrentPlayer].score += wager;
         const newScore = this.players[this.finalCurrentPlayer].score;
@@ -1398,6 +1402,7 @@ class JeopardyGame {
     }
 
     finalAnswerWrong() {
+        this.playSound('sounds/fel_svar.wav', 0.5);
         const wager = this.finalWagers[this.finalCurrentPlayer];
         this.players[this.finalCurrentPlayer].score -= wager;
         const newScore = this.players[this.finalCurrentPlayer].score;
