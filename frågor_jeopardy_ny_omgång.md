@@ -9,33 +9,33 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 
 ## Mediafiler
 
-⚠️ **25 av 25 mediafiler saknas ännu i repot:**
+✅ Alla 25 mediafiler finns på plats.
 
-- ❌ `images/questions/kalles_kaviar.png`
-- ❌ `images/questions/kalle_och_hobbe.png`
-- ❌ `images/questions/kalles_klattertrad.png`
-- ❌ `images/questions/kalle_stropp.png`
-- ❌ `images/questions/kalle.png`
-- ❌ `images/questions/1985.png`
-- ❌ `images/questions/1969.png`
-- ❌ `images/questions/1991.png`
-- ❌ `images/questions/1958.png`
-- ❌ `images/questions/1953.png`
-- ❌ `sounds/questions/rocky.mp3`
-- ❌ `sounds/questions/trainspotting.mp3`
-- ❌ `sounds/questions/citizen_kane.mp3`
-- ❌ `sounds/questions/blade_runner.mp3`
-- ❌ `sounds/questions/toy_story.mp3`
-- ❌ `images/questions/australien.png`
-- ❌ `images/questions/indien.png`
-- ❌ `images/questions/sydafrika.png`
-- ❌ `images/questions/burkina_faso.png`
-- ❌ `images/questions/bangladesh.png`
-- ❌ `images/questions/lina_och_david.png`
-- ❌ `images/questions/ludde_och_hanna.png`
-- ❌ `images/questions/david_och_hanna.png`
-- ❌ `images/questions/jonas_och_lina.png`
-- ❌ `images/questions/jonas_och_ludde.png`
+- ✅ `images/questions/kalles_kaviar.jpg`
+- ✅ `images/questions/kalle_och_hobbe.jpg`
+- ✅ `images/questions/kalles_klattertrad.jpg`
+- ✅ `images/questions/kalle_stropp.jpg`
+- ✅ `images/questions/kalle.jpg`
+- ✅ `images/questions/1985.jpg`
+- ✅ `images/questions/1969.jpg`
+- ✅ `images/questions/1991.jpg`
+- ✅ `images/questions/1958.jpg`
+- ✅ `images/questions/1953.jpg`
+- ✅ `sounds/questions/rocky.mp3`
+- ✅ `sounds/questions/trainspotting.mp3`
+- ✅ `sounds/questions/citizen_kane.mp3`
+- ✅ `sounds/questions/blade_runner.mp3`
+- ✅ `sounds/questions/toy_story.mp3`
+- ✅ `images/questions/australien.png`
+- ✅ `images/questions/indien.png`
+- ✅ `images/questions/sydafrika.png`
+- ✅ `images/questions/burkina_faso.png`
+- ✅ `images/questions/bangladesh.png`
+- ✅ `images/questions/lina_och_david.jpg`
+- ✅ `images/questions/ludde_och_hanna.jpg`
+- ✅ `images/questions/david_och_hanna.jpg`
+- ✅ `images/questions/jonas_och_lina.jpg`
+- ✅ `images/questions/jonas_och_ludde.jpg`
 
 ---
 
@@ -70,11 +70,11 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 - **500** – Bamses trillingar — *Svar: Brum, Teddy och Nalle-Maja*
 
 ### Alla dessa Kallar
-- **100** – 🖼️ Bild (`images/questions/kalles_kaviar.png`) — *Svar: Kalles kaviar*
-- **200** – 🖼️ Bild (`images/questions/kalle_och_hobbe.png`) — *Svar: Kalle och Hobbe*
-- **300** – 🖼️ Bild (`images/questions/kalles_klattertrad.png`) — *Svar: Kalles klätterträd*
-- **400** – 🖼️ Bild (`images/questions/kalle_stropp.png`) — *Svar: Kalle Stropp*
-- **500** ⭐ **Daily Double** – 🖼️ Bild (`images/questions/kalle.png`) — *Svar: Kalle*
+- **100** – 🖼️ Bild (`images/questions/kalles_kaviar.jpg`) — *Svar: Kalles kaviar*
+- **200** – 🖼️ Bild (`images/questions/kalle_och_hobbe.jpg`) — *Svar: Kalle och Hobbe*
+- **300** – 🖼️ Bild (`images/questions/kalles_klattertrad.jpg`) — *Svar: Kalles klätterträd*
+- **400** – 🖼️ Bild (`images/questions/kalle_stropp.jpg`) — *Svar: Kalle Stropp*
+- **500** ⭐ **Daily Double** – 🖼️ Bild (`images/questions/kalle.jpg`) — *Svar: Kalle*
 
 ### På bebisspråk
 - **100** – Tuttsprutt — *Svar: bröstmjölk*
@@ -109,11 +109,11 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 - **1 000** – Doménikos Theotokópoulos — *Svar: El Greco*
 
 ### Vilket år
-- **200** – 🖼️ Bild (`images/questions/1985.png`) — *Svar: 1985*
-- **400** – 🖼️ Bild (`images/questions/1969.png`) — *Svar: 1969*
-- **600** – 🖼️ Bild (`images/questions/1991.png`) — *Svar: 1991*
-- **800** – 🖼️ Bild (`images/questions/1958.png`) — *Svar: 1958*
-- **1 000** – 🖼️ Bild (`images/questions/1953.png`) — *Svar: 1953*
+- **200** – 🖼️ Bild (`images/questions/1985.jpg`) — *Svar: 1985*
+- **400** – 🖼️ Bild (`images/questions/1969.jpg`) — *Svar: 1969*
+- **600** – 🖼️ Bild (`images/questions/1991.jpg`) — *Svar: 1991*
+- **800** – 🖼️ Bild (`images/questions/1958.jpg`) — *Svar: 1958*
+- **1 000** – 🖼️ Bild (`images/questions/1953.jpg`) — *Svar: 1953*
 
 ### Dåliga låtöversättningar
 - **200** – IGEN! bebis — *Svar: ...Baby One More Time*
@@ -162,11 +162,11 @@ Sammanställning av den nya spelomgången, genererad ur `gamedata.js` (källa: `
 - **1 500** – Vad heter programledaren för turkiska Bäst i test? — *Svar: Kebabben Larsson*
 
 ### Två av oss
-- **300** – 🖼️ Bild (`images/questions/lina_och_david.png`) — *Svar: Lina och David*
-- **600** – 🖼️ Bild (`images/questions/ludde_och_hanna.png`) — *Svar: Ludde och Hanna*
-- **900** – 🖼️ Bild (`images/questions/david_och_hanna.png`) — *Svar: David och Hanna*
-- **1 200** – 🖼️ Bild (`images/questions/jonas_och_lina.png`) — *Svar: Jonas och Lina*
-- **1 500** ⭐ **Daily Double** – 🖼️ Bild (`images/questions/jonas_och_ludde.png`) — *Svar: Jonas och Ludde*
+- **300** – 🖼️ Bild (`images/questions/lina_och_david.jpg`) — *Svar: Lina och David*
+- **600** – 🖼️ Bild (`images/questions/ludde_och_hanna.jpg`) — *Svar: Ludde och Hanna*
+- **900** – 🖼️ Bild (`images/questions/david_och_hanna.jpg`) — *Svar: David och Hanna*
+- **1 200** – 🖼️ Bild (`images/questions/jonas_och_lina.jpg`) — *Svar: Jonas och Lina*
+- **1 500** ⭐ **Daily Double** – 🖼️ Bild (`images/questions/jonas_och_ludde.jpg`) — *Svar: Jonas och Ludde*
 
 ### Om programledaren
 - **300** – Djuret Jonas oftast förknippas med, vilket även är hans smeknamn — *Svar: sparven*

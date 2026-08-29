@@ -15,6 +15,7 @@ frö så att körningen är reproducerbar.
 """
 
 import openpyxl
+import os
 import random
 import json
 import re
@@ -96,7 +97,14 @@ def build_question(entry):
     """Returnerar (frågetext-html, mediasökväg eller None)"""
     clue, answer = entry['clue'], entry['answer']
     if clue == 'bild':
-        path = f"images/questions/{slugify(answer)}.png"
+        # Använd den filändelse som faktiskt finns (png föredras, annars jpg)
+        slug = slugify(answer)
+        path = f'images/questions/{slug}.png'
+        for ext in ('png', 'jpg', 'jpeg'):
+            candidate = f'images/questions/{slug}.{ext}'
+            if os.path.exists(candidate):
+                path = candidate
+                break
         alt = html.escape(answer, quote=True)
         return f'<img src="{path}" alt="{alt}" class="question-image">', path
     if clue == 'ljud':
