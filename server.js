@@ -175,6 +175,13 @@ const server = http.createServer((req, res) => {
     if (filePath === '/host') filePath = '/host.html';
     if (filePath === '/play') filePath = '/play.html';
 
+    // Logga sidanslutningar så man ser i terminalen att telefoner når fram
+    if (pathname === '/' || pathname === '/host' || pathname === '/play') {
+        const who = { '/': 'spelskärm', '/host': 'programledare', '/play': 'spelare' }[pathname];
+        const from = (req.socket.remoteAddress || '').replace('::ffff:', '');
+        console.log(`📱 ${who}-sidan öppnad från ${from}`);
+    }
+
     // Stoppa försök att läsa utanför spelmappen
     const resolved = path.normalize(path.join(ROOT, filePath));
     if (!resolved.startsWith(ROOT + path.sep) && resolved !== ROOT) {
